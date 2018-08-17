@@ -1,18 +1,19 @@
-import os
-import json
 import sys
 
 import requests
 
 from botctl.errors import GatewayError
+from botctl.types import PlatformVariable
 
 
 class Gateway:
     def __init__(self, config):
         self._config = config
+        self._environment = config.get_environment()
         self._headers = {
             'Content-Type': 'application/json',
-            'Authorization': self._config.get_value('token'),
+            'Authorization': self._config.get_value(self._environment,
+                                                    PlatformVariable.TOKEN),
             'Accept': 'application/json'
         }
         self._configure_host()
@@ -49,4 +50,5 @@ class Gateway:
 
 class BotCMSGateway(Gateway):
     def _configure_host(self):
-        self._host = self._config.get_value('cms') + '/api/v1'
+        self._host = self._config.get_value(self._environment,
+                                            PlatformVariable.CMS) + '/api/v1'

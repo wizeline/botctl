@@ -1,9 +1,10 @@
 import json
+import sys
+
 
 class BotClient:
     def __init__(self, gateway):
         self._gateway = gateway
-
 
     def get_bots(self):
         response = self._gateway.get('/bots')
@@ -16,15 +17,14 @@ class BotClient:
                 return bot
 
     def make_bot(self, bot_name):
-        response = self._gateway.post('/bots', json={'name': bot_name})
-
+        self._gateway.post('/bots', json={'name': bot_name})
 
     def post_conversation(self, bot_name, conversation):
         bot = self.get_by_name(bot_name)
         bot_id = bot.get('id')
 
         url = f'/bots/{bot_id}/conversations'
-        response = self._gateway.post(url, data=conversation)
+        self._gateway.post(url, data=conversation)
 
     def install_bot_integration(self,
                                 bot_name,

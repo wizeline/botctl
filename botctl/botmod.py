@@ -5,12 +5,13 @@ from botctl.common import command_callback
 from botctl.config import ConfigStore
 from botctl.gateway import BotCMSGateway
 
+
 def create_bot_client(config):
     return BotClient(BotCMSGateway(config))
 
 
 @command_callback
-def upload_conversation(config, bot_name):
+def update_conversation(config, bot_name):
     client = create_bot_client(config)
     conversation = sys.stdin.read()
     client.post_conversation(bot_name, conversation)
@@ -20,7 +21,7 @@ def upload_conversation(config, bot_name):
 def install_integration(config, bot_name, integration_name):
     client = create_bot_client(config)
     integration = sys.stdin.read()
-    print (integration)
+    print(integration)
     client.install_bot_integration(bot_name, integration_name, integration)
 
 
@@ -29,7 +30,7 @@ def main():
     command, args = sys.argv[1], sys.argv[2:]
 
     callbacks = {
-        'update-conversation': upload_conversation,
+        'update-conversation': update_conversation,
         'install-integration': install_integration
     }
 
