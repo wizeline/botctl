@@ -5,17 +5,17 @@ from botctl.common import command_callback
 from botctl.config import ConfigStore
 
 
-class BotMaker(BotClientCommand):
+class BotKiller(BotClientCommand):
     """Usage:
-    $ mkbot {BOT_NAME}
+    $ rmbot {BOT_NAME}
     """
     @command_callback
     def __call__(self, bot_name):
-        return self.client.make_bot(bot_name)
+        return self.client.destroy_bot(bot_name)
 
 
 def main():
-    command = BotMaker(ConfigStore())
+    command = BotKiller(ConfigStore())
     if len(sys.argv) < 2:
         print(command.help())
         sys.exit(1)

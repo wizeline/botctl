@@ -1,8 +1,5 @@
 from tests import CommandTestCase
 
-import botctl.config
-
-from botctl.config import ConfigStore
 from botctl.errors import UndefinedConfigValue
 from botctl.types import PlatformEnvironment, PlatformVariable
 

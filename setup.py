@@ -49,6 +49,7 @@ if __name__ == '__main__':
                 "hibot = botctl.hibot:main",
                 "lsbot = botctl.lsbot:main",
                 "mkbot = botctl.mkbot:main",
+                "rmbot = botctl.rmbot:main",
                 "showbot = botctl.showbot:main",
                 "botctl = botctl.botctl:main",
                 "botmod = botctl.botmod:main",

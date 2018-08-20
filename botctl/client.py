@@ -1,6 +1,9 @@
 import json
 import sys
 
+from botctl.gateway import BotCMSGateway
+from botctl.types import BotControlCommand
+
 
 class BotClient:
     def __init__(self, gateway):
@@ -18,6 +21,13 @@ class BotClient:
 
     def make_bot(self, bot_name):
         self._gateway.post('/bots', json={'name': bot_name})
+
+    def destroy_bot(self, bot_name):
+        bot = self.get_by_name(bot_name)
+        bot_id = bot.get('id')
+
+        url = f'/bots/{bot_id}'
+        self._gateway.delete(url)
 
     def post_conversation(self, bot_name, conversation):
         bot = self.get_by_name(bot_name)
@@ -45,3 +55,23 @@ class BotClient:
         if not response.ok:
             sys.stderr.write((f'Could not install {integration_name} '
                               f'integration on bot {bot_name}\n'))
+
+    def install_nlp(self, bot_name, nlp_config):
+        bot = self.get_by_name(bot_name)
+        bot_id = bot.get('id')
+
+        url = f'/bots/{bot_id}/nlp_provider/luis'
+        response = self._gateway.post(url, json=json.loads(nlp_config))
+        if not response.ok:
+            print(response.status_code, response.text)
+
+
+class BotClientCommand(BotControlCommand):
+    def set_up(self):
+        self.client = BotClient(BotCMSGateway(self.config))
+
+    def dump_bot_name(self, bot):
+        print(bot.get('name'))
+
+    def dump_bot(self, bot):
+        print(json.dumps(bot, indent=2))

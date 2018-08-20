@@ -1,38 +1,74 @@
 import sys
 
-from botctl.client import BotClient
-from botctl.common import command_callback
+from botctl.client import BotClientCommand
+from botctl.common import command_callback, display_help
 from botctl.config import ConfigStore
-from botctl.gateway import BotCMSGateway
 
 
-def create_bot_client(config):
-    return BotClient(BotCMSGateway(config))
+class UpdateConversationCommand(BotClientCommand):
+    """Usage:
+    $ botmod update-conversation {BOT_NAME} < CONVERSATION_FILE.json
+    """
+
+    __commandname__ = 'update-conversation'
+
+    @command_callback
+    def __call__(self, bot_name):
+        conversation = sys.stdin.read()
+        self.client.post_conversation(bot_name, conversation)
 
 
-@command_callback
-def update_conversation(config, bot_name):
-    client = create_bot_client(config)
-    conversation = sys.stdin.read()
-    client.post_conversation(bot_name, conversation)
+class InstallIntegrationCommand(BotClientCommand):
+    """Usage:
+    $ botmod install-integration {BOT_NAME} {INTEGRATION_NAME} < CONFIG.json
+    """
 
+    __commandname__ = 'install-integration'
 
-@command_callback
-def install_integration(config, bot_name, integration_name):
-    client = create_bot_client(config)
-    integration = sys.stdin.read()
-    print(integration)
-    client.install_bot_integration(bot_name, integration_name, integration)
+    @command_callback
+    def __call__(self, bot_name, integration_name):
+        integration = sys.stdin.read()
+        print(integration)
+        self.client.install_bot_integration(bot_name,
+                                            integration_name,
+                                            integration)
 
+class InstallNLP(BotClientCommand):
+    """Usage:
+    $ botmod install-nlp {BOT_NAME} < NLP_CONFIG.json
+    """
+    __commandname__ = 'train'
+
+    @command_callback
+    def __call__(self, bot_name):
+        nlp_config = sys.stdin.read()
+        print(nlp_config)
+        self.client.install_nlp(bot_name, nlp_config)
 
 def main():
     config = ConfigStore()
-    command, args = sys.argv[1], sys.argv[2:]
-
     callbacks = {
-        'update-conversation': update_conversation,
-        'install-integration': install_integration
+        'update-conversation': UpdateConversationCommand(config),
+        'install-integration': InstallIntegrationCommand(config),
+        'install-nlp': InstallNLP(config)
     }
 
-    action = callbacks[command]
-    sys.exit(action(config, *args))
+    if len(sys.argv) == 1:
+        print('Usage:\n\t$ botmod [COMMAND] [OPTIONS]\n\n'
+              'Commands available:')
+        for command_name in callbacks.keys():
+            print('\t*', command_name)
+        sys.exit(0)
+
+    command, args = sys.argv[1], sys.argv[2:]
+
+    if command == 'help':
+        action = callbacks.get(args[0])
+        sys.exit(display_help(callbacks.get(args[0])))
+
+    else:
+        action = callbacks.get(command)
+        if action is None:
+            sys.stderr.write('Unknown command\n')
+            sys.exit(2)
+        sys.exit(action(*args))
