@@ -22,6 +22,13 @@ class BotClient:
     def make_bot(self, bot_name):
         self._gateway.post('/bots', json={'name': bot_name})
 
+    def destroy_bot(self, bot_name):
+        bot = self.get_by_name(bot_name)
+        bot_id = bot.get('id')
+
+        url = f'/bots/{bot_id}'
+        self._gateway.delete(url)
+
     def post_conversation(self, bot_name, conversation):
         bot = self.get_by_name(bot_name)
         bot_id = bot.get('id')
