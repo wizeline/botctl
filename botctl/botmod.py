@@ -1,18 +1,11 @@
 import sys
 
-from botctl.client import BotClient
+from botctl.client import BotClientCommand
 from botctl.common import command_callback, display_help
 from botctl.config import ConfigStore
-from botctl.gateway import BotCMSGateway
-from botctl.types import BotControlCommand
 
 
-class BotModifyCommand(BotControlCommand):
-    def set_up(self):
-        self.client = BotClient(BotCMSGateway(self.config))
-
-
-class UpdateConversationCommand(BotModifyCommand):
+class UpdateConversationCommand(BotClientCommand):
     """Usage:
     $ botmod update-conversation {BOT_NAME} < CONVERSATION_FILE.json
     """
@@ -25,7 +18,7 @@ class UpdateConversationCommand(BotModifyCommand):
         self.client.post_conversation(bot_name, conversation)
 
 
-class InstallIntegrationCommand(BotModifyCommand):
+class InstallIntegrationCommand(BotClientCommand):
     """Usage:
     $ botmod install-integration {BOT_NAME} {INTEGRATION_NAME} < CONFIG.json
     """
@@ -40,15 +33,34 @@ class InstallIntegrationCommand(BotModifyCommand):
                                             integration_name,
                                             integration)
 
+class InstallNLP(BotClientCommand):
+    """Usage:
+    $ botmod install-nlp {BOT_NAME} < NLP_CONFIG.json
+    """
+    __commandname__ = 'train'
+
+    @command_callback
+    def __call__(self, bot_name):
+        nlp_config = sys.stdin.read()
+        print(nlp_config)
+        self.client.install_nlp(bot_name, nlp_config)
 
 def main():
     config = ConfigStore()
-    command, args = sys.argv[1], sys.argv[2:]
-
     callbacks = {
         'update-conversation': UpdateConversationCommand(config),
-        'install-integration': InstallIntegrationCommand(config)
+        'install-integration': InstallIntegrationCommand(config),
+        'install-nlp': InstallNLP(config)
     }
+
+    if len(sys.argv) == 1:
+        print('Usage:\n\t$ botmod [COMMAND] [OPTIONS]\n\n'
+              'Commands available:')
+        for command_name in callbacks.keys():
+            print('\t*', command_name)
+        sys.exit(0)
+
+    command, args = sys.argv[1], sys.argv[2:]
 
     if command == 'help':
         action = callbacks.get(args[0])

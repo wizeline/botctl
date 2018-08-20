@@ -49,6 +49,15 @@ class BotClient:
             sys.stderr.write((f'Could not install {integration_name} '
                               f'integration on bot {bot_name}\n'))
 
+    def install_nlp(self, bot_name, nlp_config):
+        bot = self.get_by_name(bot_name)
+        bot_id = bot.get('id')
+
+        url = f'/bots/{bot_id}/nlp_provider/luis'
+        response = self._gateway.post(url, json=json.loads(nlp_config))
+        if not response.ok:
+            print(response.status_code, response.text)
+
 
 class BotClientCommand(BotControlCommand):
     def set_up(self):

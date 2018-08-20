@@ -58,15 +58,24 @@ class ChangeEnvironmentCommand(BotControlCommand):
 
 def main():
     config = ConfigStore()
-    command = sys.argv[1]
-    args = sys.argv[2:]
-
     callbacks = {
         'set': SetCommand(config),
         'get': GetCommand(config),
         'del': DelCommand(config),
         'chenv': ChangeEnvironmentCommand(config)
     }
+
+    if len(sys.argv) == 1:
+        print('Usage:\n\t$ botctl [COMMAND] [OPTIONS]\n\n'
+              'Commands available:')
+        for command_name in callbacks.keys():
+            print('\t*', command_name)
+
+        print('For help:\n\t$ botctl help [COMMAND]')
+        sys.exit(0)
+
+    command = sys.argv[1]
+    args = sys.argv[2:]
 
     if command == 'help':
         action = callbacks.get(args[0])
