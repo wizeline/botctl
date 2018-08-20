@@ -38,14 +38,17 @@ class Gateway:
     def _configure_host(self):
         self._host = ''
 
+    def delete(self, endpoint, headers={}, data={}, json={}):
+        return self._request('DELETE', endpoint, headers, data, json)
+
     def get(self, endpoint, headers={}, data={}, json={}):
         return self._request('GET', endpoint, headers, data, json)
 
     def post(self, endpoint, headers={}, data={}, json={}):
         return self._request('POST', endpoint, headers, data, json)
 
-    def delete(self, endpoint, headers={}, data={}, json={}):
-        return self._request('DELETE', endpoint, headers, data, json)
+    def put(self, endpoint, headers={}, data={}, json={}):
+        return self._request('PUT', endpoint, headers, data, json)
 
 
 class BotCMSGateway(Gateway):
