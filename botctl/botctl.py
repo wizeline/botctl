@@ -1,36 +1,59 @@
 import sys
 
-from botctl.common import command_callback, parse_variable
+from botctl.common import command_callback, display_help, parse_variable
 from botctl.config import ConfigStore
-from botctl.types import PlatformEnvironment
+from botctl.types import PlatformEnvironment, BotControlCommand
 
 
-@command_callback
-def del_config_value(config, variable_name):
-    environment, variable = parse_variable(config, variable_name)
-    config.del_value(environment, variable)
-    config.commit()
+class DelCommand(BotControlCommand):
+    """Usage:
+    $ botctl del <variable>
+    """
+    __commandname__ = 'del'
+
+    @command_callback
+    def __call__(self, variable_name):
+        environment, variable = parse_variable(self.config, variable_name)
+        self.config.del_value(environment, variable)
+        self.config.commit()
 
 
-@command_callback
-def get_config_value(config, variable_name):
-    environment, variable = parse_variable(config, variable_name)
-    print(environment, variable)
-    print(config.get_value(environment, variable))
+class GetCommand(BotControlCommand):
+    """Usage:
+    $ botctl get <variable>
+    """
+    __commandname__ = 'get'
+
+    @command_callback
+    def __call__(self, variable_name):
+        environment, variable = parse_variable(self.config, variable_name)
+        print(self.config.get_value(environment, variable))
 
 
-@command_callback
-def set_config_value(config, variable_name, variable_value):
-    environment, variable = parse_variable(config, variable_name)
-    config.put_value(environment, variable, variable_value)
-    config.commit()
+class SetCommand(BotControlCommand):
+    """Usage
+    $ botctl set <variable> <value>
+    """
+    __commandname__ = 'set'
+
+    @command_callback
+    def __call__(self, variable_name, variable_value):
+        environment, variable = parse_variable(self.config, variable_name)
+        self.config.put_value(environment, variable, variable_value)
+        self.config.commit()
 
 
-@command_callback
-def change_environment(config, environment_name):
-    environment = PlatformEnvironment(environment_name.upper())
-    config.set_environment(environment)
-    config.commit()
+class ChangeEnvironmentCommand(BotControlCommand):
+    """Usage
+    $ botctl chenv {local | development | production}
+    """
+    __commandname__ = 'chenv'
+
+    @command_callback
+    def __call__(self, environment_name):
+        environment = PlatformEnvironment(environment_name.upper())
+        self.config.set_environment(environment)
+        self.config.commit()
 
 
 def main():
@@ -39,11 +62,19 @@ def main():
     args = sys.argv[2:]
 
     callbacks = {
-        'set': set_config_value,
-        'get': get_config_value,
-        'del': del_config_value,
-        'chenv': change_environment
+        'set': SetCommand(config),
+        'get': GetCommand(config),
+        'del': DelCommand(config),
+        'chenv': ChangeEnvironmentCommand(config)
     }
 
-    action = callbacks[command]
-    sys.exit(action(config, *args))
+    if command == 'help':
+        action = callbacks.get(args[0])
+        sys.exit(display_help(callbacks.get(args[0])))
+
+    else:
+        action = callbacks.get(command)
+        if action is None:
+            sys.stderr.write('Unknown command\n')
+            sys.exit(2)
+        sys.exit(action(*args))

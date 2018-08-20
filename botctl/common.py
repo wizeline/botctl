@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from botctl.errors import BotControlError
 from botctl.types import PlatformEnvironment, PlatformVariable
@@ -31,3 +32,12 @@ def parse_variable(config, raw_variable):
         variable = PlatformVariable(raw_variable)
 
     return environment, variable
+
+
+def display_help(command):
+    if command is None:
+        sys.stderr.write('Unknown command\n')
+        return 1
+
+    print(command.help())
+    return 0

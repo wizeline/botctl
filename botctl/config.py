@@ -78,4 +78,3 @@ class ConfigStore:
 
     def set_environment(self, environment):
         self._config[SYSTEM_SECTION]['environment'] = environment.value
-

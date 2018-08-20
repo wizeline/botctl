@@ -7,6 +7,7 @@ from botctl.config import ConfigStore
 
 TEST_HOME = os.path.join(os.path.dirname(__file__), 'home')
 
+
 class CommandTestCase(unittest.TestCase):
     def setUp(self):
         botctl.config.__configdir__ = TEST_HOME
