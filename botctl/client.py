@@ -35,7 +35,12 @@ class BotClient:
         bot_id = bot.get('id')
 
         url = f'/bots/{bot_id}/integrations/{integration_name}/install'
-        response = self._gateway.post(url, json=json.loads(integration_config))
+        request_body = json.loads(integration_config)
+        response = self._gateway.post(url, json=request_body)
+
+        if response.status_code == 409:
+            url = f'/bots/{bot_id}/integrations/{integration_name}'
+            response = self._gateway.put(url, json=request_body)
 
         if not response.ok:
             sys.stderr.write((f'Could not install {integration_name} '
