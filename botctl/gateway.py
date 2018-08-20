@@ -28,7 +28,7 @@ class Gateway:
             json=json
         )
 
-        if not response.ok:
+        if response.status_code >= 500:
             sys.stderr.write(f'Request failed: {response.status_code}\n'
                              f'Response body: {response.text}\n')
             raise GatewayError(response)
