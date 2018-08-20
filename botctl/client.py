@@ -1,6 +1,9 @@
 import json
 import sys
 
+from botctl.gateway import BotCMSGateway
+from botctl.types import BotControlCommand
+
 
 class BotClient:
     def __init__(self, gateway):
@@ -45,3 +48,14 @@ class BotClient:
         if not response.ok:
             sys.stderr.write((f'Could not install {integration_name} '
                               f'integration on bot {bot_name}\n'))
+
+
+class BotClientCommand(BotControlCommand):
+    def set_up(self):
+        self.client = BotClient(BotCMSGateway(self.config))
+
+    def dump_bot_name(self, bot):
+        print(bot.get('name'))
+
+    def dump_bot(self, bot):
+        print(json.dumps(bot, indent=2))
