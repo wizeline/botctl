@@ -18,7 +18,7 @@ class Gateway:
         }
         self._configure_host()
 
-    def _request(self, method, endpoint, headers, data, json):
+    def _request(self, method, endpoint, headers, data, json, fail):
         self._headers.update(headers)
         response = requests.request(
             method,
@@ -28,9 +28,10 @@ class Gateway:
             json=json
         )
 
-        if response.status_code >= 500:
+        if (fail, response.ok) == (True, False):
             sys.stderr.write(f'Request failed: {response.status_code}\n'
-                             f'Response body: {response.text}\n')
+                             f'Response body: {response.text}\n'
+                             f'request body: {response.request.body}')
             raise GatewayError(response)
 
         return response
@@ -38,17 +39,17 @@ class Gateway:
     def _configure_host(self):
         self._host = ''
 
-    def delete(self, endpoint, headers={}, data={}, json={}):
-        return self._request('DELETE', endpoint, headers, data, json)
+    def delete(self, endpoint, headers={}, data={}, json={}, fail=True):
+        return self._request('DELETE', endpoint, headers, data, json, fail)
 
-    def get(self, endpoint, headers={}, data={}, json={}):
-        return self._request('GET', endpoint, headers, data, json)
+    def get(self, endpoint, headers={}, data={}, json={}, fail=True):
+        return self._request('GET', endpoint, headers, data, json, fail)
 
-    def post(self, endpoint, headers={}, data={}, json={}):
-        return self._request('POST', endpoint, headers, data, json)
+    def post(self, endpoint, headers={}, data={}, json={}, fail=True):
+        return self._request('POST', endpoint, headers, data, json, fail)
 
-    def put(self, endpoint, headers={}, data={}, json={}):
-        return self._request('PUT', endpoint, headers, data, json)
+    def put(self, endpoint, headers={}, data={}, json={}, fail=True):
+        return self._request('PUT', endpoint, headers, data, json, fail)
 
 
 class BotCMSGateway(Gateway):
