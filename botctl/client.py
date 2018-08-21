@@ -1,6 +1,8 @@
 import json
 import sys
 
+from datetime import datetime
+
 from botctl.gateway import BotCMSGateway
 from botctl.types import BotControlCommand
 
@@ -34,7 +36,16 @@ class BotClient:
         bot_id = bot.get('id')
 
         url = f'/bots/{bot_id}/conversations'
-        self._gateway.post(url, data=conversation)
+        response = self._gateway.post(url, data=conversation, fail=False)
+        if not response.ok:
+            # Now de platform expects the name of the script file
+            parsed_conversation = json.loads(conversation)
+            time_stamp = datetime.utcnow().timestamp()
+            body = {
+                'name': f'{time_stamp}-{bot_name}-script.json',
+                'script': json.dumps(parsed_conversation)
+            }
+            response = self._gateway.post(url, json=body)
 
     def install_bot_integration(self,
                                 bot_name,
@@ -46,7 +57,7 @@ class BotClient:
 
         url = f'/bots/{bot_id}/integrations/{integration_name}/install'
         request_body = json.loads(integration_config)
-        response = self._gateway.post(url, json=request_body)
+        response = self._gateway.post(url, json=request_body, fail=False)
 
         if response.status_code == 409:
             url = f'/bots/{bot_id}/integrations/{integration_name}'

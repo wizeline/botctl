@@ -5,6 +5,18 @@ instance of bots platform only.
 ## Commands included
 
 ### botctl
+```
+Usage:
+        $ botctl [COMMAND] [OPTIONS]
+
+Commands available:
+        * set
+        * get
+        * del
+        * chenv
+For help:
+        $ botctl help [COMMAND]
+```
 
 Usage:
 ```sh
@@ -17,10 +29,35 @@ $ botctl get token
 $ botctl del token
 ```
 
+Other platform variables are:
+
+- cms
+- operations
+- integrations
+- analytics
+
+And they set the URL for each platform component
+
+```sh
+$ botctl chenv local
+```
+```sh
+$ botctl chenv development
+```
+```sh
+$ botctl chenv production
+```
+
 ### mkbot
 Usage:
 ```sh
 $ mkbot bot-for-testing
+```
+
+### rmbot
+Usage:
+```sh
+$ rmbot bot-for-testing
 ```
 
 ### lsbot
@@ -41,7 +78,19 @@ Usage:
 ```sh
 $ botmod install-integration BOT_NAME INTEGRATION_NAME < integration-config.json
 ```
-
 ```sh
 $ botmod update-conversation BOT_NAME < conversation-script.json
+```
+```sh
+$ botmod install-nlp BOT_NAME < nlp-configuration.json
+```
+nlp-configuration.json looks like:
+```javascript
+{
+  "region": "string",
+  "version": "string",
+  "app_id": "string",
+  "subscription_key": "string",
+  "env": "string"
+}
 ```
