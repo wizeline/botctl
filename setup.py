@@ -48,7 +48,9 @@ if __name__ == '__main__':
             "console_scripts": [
                 "hibot = botctl.hibot:main",
                 "lsbot = botctl.lsbot:main",
+                "mkadmin = botctl.mkadmin:main",
                 "mkbot = botctl.mkbot:main",
+                "rmadmin = botctl.rmadmin:main",
                 "rmbot = botctl.rmbot:main",
                 "showbot = botctl.showbot:main",
                 "botctl = botctl.botctl:main",

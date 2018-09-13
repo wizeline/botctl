@@ -27,6 +27,16 @@ class BotClient:
 
                 return bot
 
+    def make_admin(self, bot_id, user_id):
+        self.set_user_role(bot_id, user_id, 'admin')
+
+    def remove_admin(self, bot_id, user_id):
+        self.set_user_role(bot_id, user_id, 'customer')
+
+    def set_user_role(self, bot_id, user_id, role):
+        url = f'/bots/{bot_id}/users/{user_id}'
+        self._gateway.put(url, json={'role': role})
+
     def make_bot(self, bot_name):
         self._gateway.post('/bots', json={'name': bot_name})
 
