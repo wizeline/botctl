@@ -2,7 +2,7 @@ import sys
 
 import requests
 
-from botctl.errors import GatewayError
+from botctl.errors import GatewayError, TokenExpiredError
 from botctl.types import PlatformVariable
 
 
@@ -27,6 +27,9 @@ class Gateway:
             data=data,
             json=json
         )
+
+        if response.status_code == 401:
+            raise TokenExpiredError(response)
 
         if (fail, response.ok) == (True, False):
             sys.stderr.write(f'Request failed: {response.status_code}\n'

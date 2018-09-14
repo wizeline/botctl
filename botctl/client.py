@@ -120,10 +120,10 @@ class BotClientCommand(BotControlCommand):
 
     def dump_bot(self, bot):
         name = bot['name']
-        updated = bot['updatedTime']
-        bot_header = f'Bot {name} updated on {updated}\n'
-        users = map(lambda u: f"{u['email']} ({u['role']})", bot.get('users', []))
-        users_table = '\n  '.join(users)
+        bot_id = bot['id']
+        bot_header = f'name: {name}\nid: {bot_id}\n'
+        users = map(lambda u: f"- {u['email']} ({u['role']})", bot.get('users', []))
+        users_table = '\n'.join(users)
 
         print(bot_header)
-        print(f'Users:\n  {users_table}')
+        print(f'Users:\n{users_table}')
