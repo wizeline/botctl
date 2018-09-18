@@ -45,12 +45,45 @@ class InstallNLP(BotClientCommand):
         print(nlp_config)
         self.client.install_nlp(bot_name, nlp_config)
 
+
+class InviteUserCommand(BotClientCommand):
+    """Usage:
+    $ botmod invite {BOT_NAME} {USERS_EMAIL}
+    """
+
+    __commandname__ = 'invite'
+
+    @command_callback
+    def __call__(self, bot_name, users_email):
+        bot = self.client.get_by_name(bot_name)
+        self.client.invite_user(bot['id'], users_email)
+
+
+class UninviteUserCommand(BotClientCommand):
+    """Usage
+    $ botmod uninvite {BOT_NAME} {USERS_EMAIL}
+    """
+    __commandname__ = 'uninvite'
+
+    @command_callback
+    def __call__(self, bot_name, users_email):
+        bot = self.client.get_by_name(bot_name)
+        for user in bot['users']:
+            if users_email == user['email']:
+                self.client.uninvite_user(bot['id'], user['id'])
+                return 0
+
+        sys.stderr.write(f'Not a bot user: [{bot_name}] [{users_email}]\n')
+        return 1
+
 def main():
     config = ConfigStore()
     callbacks = {
         'update-conversation': UpdateConversationCommand(config),
         'install-integration': InstallIntegrationCommand(config),
-        'install-nlp': InstallNLP(config)
+        'install-nlp': InstallNLP(config),
+        'invite': InviteUserCommand(config),
+        'uninvite': UninviteUserCommand(config)
     }
 
     if len(sys.argv) == 1:

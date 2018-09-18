@@ -1,7 +1,9 @@
 import json
 import sys
+import operator
 
 from datetime import datetime
+from functools import reduce
 
 from botctl.gateway import BotCMSGateway
 from botctl.types import BotControlCommand
@@ -19,7 +21,21 @@ class BotClient:
         bots = self.get_bots()
         for bot in bots:
             if bot.get('name') == bot_name:
+                users = self.get_bot_users_by_id(bot['id'])
+                if users:
+                    bot.update({'users': users})
+
                 return bot
+
+    def make_admin(self, bot_id, user_id):
+        self.set_user_role(bot_id, user_id, 'admin')
+
+    def remove_admin(self, bot_id, user_id):
+        self.set_user_role(bot_id, user_id, 'customer')
+
+    def set_user_role(self, bot_id, user_id, role):
+        url = f'/bots/{bot_id}/users/{user_id}'
+        self._gateway.put(url, json={'role': role})
 
     def make_bot(self, bot_name):
         self._gateway.post('/bots', json={'name': bot_name})
@@ -29,6 +45,24 @@ class BotClient:
         bot_id = bot.get('id')
 
         url = f'/bots/{bot_id}'
+        self._gateway.delete(url)
+
+    def get_bot_users_by_id(self, bot_id):
+        url = f'/bots/{bot_id}/users'
+        return self._gateway.get(url).json()
+
+    def invite_user(self, bot_name, user_email):
+        bot = self.get_by_name(bot_name)
+        bot_id = bot.get('id')
+        url = f'/bots/{bot_id}/invite'
+        self._gateway.post(url, json={'email': user_email})
+
+    def invite_user(self, bot_id, user_email):
+        url = f'/bots/{bot_id}/invite'
+        self._gateway.post(url, json={'email': user_email})
+
+    def uninvite_user(self, bot_id, user_id):
+        url = f'/bots/{bot_id}/users/{user_id}'
         self._gateway.delete(url)
 
     def post_conversation(self, bot_name, conversation):
@@ -85,4 +119,11 @@ class BotClientCommand(BotControlCommand):
         print(bot.get('name'))
 
     def dump_bot(self, bot):
-        print(json.dumps(bot, indent=2))
+        name = bot['name']
+        bot_id = bot['id']
+        bot_header = f'name: {name}\nid: {bot_id}\n'
+        users = map(lambda u: f"- {u['email']} ({u['role']})", bot.get('users', []))
+        users_table = '\n'.join(users)
+
+        print(bot_header)
+        print(f'Users:\n{users_table}')

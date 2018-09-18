@@ -15,6 +15,7 @@ def command_callback(callback):
 
         except BotControlError as expected_error:
             logger.debug(expected_error)
+            sys.stderr.write(f'{expected_error}\n')
             rc = -1
 
         return rc

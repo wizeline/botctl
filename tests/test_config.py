@@ -13,7 +13,7 @@ class TestConfig(CommandTestCase):
                                     PlatformVariable.CMS)
 
         self.assertEqual(cms, 'http://localhost:8001')
-        self.config.del_variable(PlatformEnvironment.LOCAL,
+        self.config.del_value(PlatformEnvironment.LOCAL,
                                  PlatformVariable.CMS)
 
         with self.assertRaises(UndefinedConfigValue):
