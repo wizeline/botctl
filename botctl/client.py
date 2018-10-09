@@ -5,7 +5,7 @@ import operator
 from datetime import datetime
 from functools import reduce
 
-from botctl.gateway import BotCMSGateway
+from botctl.gateway import BotCMSGateway, BotIntegrationsGateway
 from botctl.types import BotControlCommand
 
 
@@ -122,8 +122,70 @@ class BotClientCommand(BotControlCommand):
         name = bot['name']
         bot_id = bot['id']
         bot_header = f'name: {name}\nid: {bot_id}\n'
-        users = map(lambda u: f"- {u['email']} ({u['role']})", bot.get('users', []))
+        users = map(
+            lambda u: f"- {u['email']} ({u['role']})", bot.get('users', [])
+        )
         users_table = '\n'.join(users)
 
         print(bot_header)
         print(f'Users:\n{users_table}')
+
+
+class IntegrationClient:
+    def __init__(self, gateway):
+        self._gateway = gateway
+
+    def get_integration(self, integration_name):
+        return self._gateway.get(
+            f'/integrations/{integration_name}'
+        ).json()
+
+    def get_integrations(self):
+        return self._gateway.get(
+            '/integrations'
+        ).json()
+
+    def get_function(self, integration_name, function_name):
+        return self._gateway.get(
+            f'/integrations/{integration_name}/functions/{function_name}'
+        ).json()
+
+    def call_function(self, integration_name, function_name, args):
+        if args:
+            function_spec = self.get_function(integration_name, function_name)
+            payload = self._build_function_payload(function_spec, args)
+            return self._gateway.post(
+                f'/integrations/{integration_name}/functions/{function_name}',
+                json=payload
+            ).json()
+        else:
+            return self._gateway.post(
+                f'/integrations/{integration_name}/functions/{function_name}'
+            ).json()
+
+
+class IntegrationClientCommand(BotControlCommand):
+    def set_up(self):
+        self.client = IntegrationClient(BotIntegrationsGateway(self.config))
+
+    def _dump_config_options(self, integration):
+        options = integration.get('configuration_options')
+        if not options:
+            return
+
+        print('CONFIGURATION OPTIONS')
+        for option, spec in options.items():
+            print(f'{option:25}  {spec["description"]}')
+
+    def _dump_function_names(self, integration):
+        functions = integration.get('functions')
+        if not functions:
+            return
+
+        print('\nFUNCTIONS AVAILABLE')
+        for function_name in sorted(functions.keys()):
+            print(function_name)
+
+    def dump_integration(self, integration):
+        self._dump_config_options(integration)
+        self._dump_function_names(integration)
