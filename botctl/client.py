@@ -1,11 +1,9 @@
 import json
 import sys
-import operator
 
 from datetime import datetime
-from functools import reduce
 
-from botctl.gateway import BotCMSGateway
+from botctl.gateway import BotCMSGateway, BotIntegrationsGateway
 from botctl.types import BotControlCommand
 
 
@@ -54,10 +52,6 @@ class BotClient:
     def invite_user(self, bot_name, user_email):
         bot = self.get_by_name(bot_name)
         bot_id = bot.get('id')
-        url = f'/bots/{bot_id}/invite'
-        self._gateway.post(url, json={'email': user_email})
-
-    def invite_user(self, bot_id, user_email):
         url = f'/bots/{bot_id}/invite'
         self._gateway.post(url, json={'email': user_email})
 
@@ -122,8 +116,86 @@ class BotClientCommand(BotControlCommand):
         name = bot['name']
         bot_id = bot['id']
         bot_header = f'name: {name}\nid: {bot_id}\n'
-        users = map(lambda u: f"- {u['email']} ({u['role']})", bot.get('users', []))
+        users = map(
+            lambda u: f"- {u['email']} ({u['role']})", bot.get('users', [])
+        )
         users_table = '\n'.join(users)
 
         print(bot_header)
         print(f'Users:\n{users_table}')
+
+
+class IntegrationClient:
+    def __init__(self, gateway):
+        self._gateway = gateway
+
+    def get_integration(self, integration_name):
+        return self._gateway.get(
+            f'/integrations/{integration_name}'
+        ).json()
+
+    def get_integrations(self):
+        return self._gateway.get(
+            '/integrations'
+        ).json()
+
+    def get_function(self, integration_name, function_name):
+        return self._gateway.get(
+            f'/integrations/{integration_name}/functions/{function_name}'
+        ).json()
+
+    def call_function(
+            self,
+            integration_name,
+            function_name,
+            payload
+    ):
+        return self._gateway.post(
+            f'/integrations/{integration_name}/functions/{function_name}',
+            json=payload
+        ).json()
+
+
+class IntegrationClientCommand(BotControlCommand):
+    def set_up(self):
+        self.client = IntegrationClient(BotIntegrationsGateway(self.config))
+
+    def _dump_config_options(self, integration_spec):
+        options = integration_spec.get('configuration_options')
+        if not options:
+            return
+
+        print('CONFIGURATION OPTIONS')
+        for option, spec in options.items():
+            print(f'{option:25}  {spec["description"]}')
+
+    def _dump_function_names(self, integration_spec):
+        functions = integration_spec.get('functions')
+        if not functions:
+            return
+
+        print('\nFUNCTIONS AVAILABLE')
+        for function_name in sorted(functions.keys()):
+            print(function_name)
+
+    def dump_integration(self, integration_spec):
+        self._dump_config_options(integration_spec)
+        self._dump_function_names(integration_spec)
+
+    def dump_function(self, integration_name, function_name, function_spec):
+        desc = function_spec['description']
+        params = function_spec['params']
+
+        line_format = '{name:20}  {param_type:5}  {desc}'
+        print(f'FUNCTION: {integration_name}.{function_name}()\n')
+        print(line_format.format(
+            name='PARAMETER',
+            param_type='TYPE',
+            desc='DESCRIPTION'
+        ))
+        for name, value in params.items():
+            print(line_format.format(
+                name=name,
+                param_type=value['type'],
+                desc=value['description']
+            ))

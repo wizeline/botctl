@@ -55,6 +55,7 @@ if __name__ == '__main__':
                 "showbot = botctl.showbot:main",
                 "botctl = botctl.botctl:main",
                 "botmod = botctl.botmod:main",
+                "integration = botctl.integration:main"
             ]
         }
     )

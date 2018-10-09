@@ -12,8 +12,6 @@ class Gateway:
         self._environment = config.get_environment()
         self._headers = {
             'Content-Type': 'application/json',
-            'Authorization': self._config.get_value(self._environment,
-                                                    PlatformVariable.TOKEN),
             'Accept': 'application/json'
         }
         self._configure_host()
@@ -40,7 +38,7 @@ class Gateway:
         return response
 
     def _configure_host(self):
-        self._host = ''
+        raise NotImplementedError
 
     def delete(self, endpoint, headers={}, data={}, json={}, fail=True):
         return self._request('DELETE', endpoint, headers, data, json, fail)
@@ -57,5 +55,23 @@ class Gateway:
 
 class BotCMSGateway(Gateway):
     def _configure_host(self):
+        self._headers.update({
+            'Authorization': self._config.get_value(self._environment,
+                                                    PlatformVariable.TOKEN)
+        })
         self._host = self._config.get_value(self._environment,
                                             PlatformVariable.CMS) + '/api/v1'
+
+
+class BotIntegrationsGateway(Gateway):
+    def _configure_host(self):
+        self._headers.update({
+            'Authorization': self._config.get_value(
+                self._environment,
+                PlatformVariable.API_SECRET
+            )
+        })
+        self._host = self._config.get_value(
+            self._environment,
+            PlatformVariable.INTEGRATIONS_MANAGER
+        )

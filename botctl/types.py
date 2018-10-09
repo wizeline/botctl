@@ -16,6 +16,7 @@ class PlatformEnvironment(BotControlEnum):
 
 class PlatformVariable(BotControlEnum):
     ANALYTICS = 'analytics'
+    API_SECRET = 'api_secret'
     BOT = 'bot'
     CMS = 'cms'
     INTEGRATIONS_MANAGER = 'integrations'
