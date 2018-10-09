@@ -58,7 +58,7 @@ class BotCMSGateway(Gateway):
         self._headers.update({
             'Authorization': self._config.get_value(self._environment,
                                                     PlatformVariable.TOKEN)
-        }) 
+        })
         self._host = self._config.get_value(self._environment,
                                             PlatformVariable.CMS) + '/api/v1'
 

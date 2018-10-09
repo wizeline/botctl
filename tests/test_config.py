@@ -14,7 +14,7 @@ class TestConfig(CommandTestCase):
 
         self.assertEqual(cms, 'http://localhost:8001')
         self.config.del_value(PlatformEnvironment.LOCAL,
-                                 PlatformVariable.CMS)
+                              PlatformVariable.CMS)
 
         with self.assertRaises(UndefinedConfigValue):
             self.config.get_value(PlatformEnvironment.LOCAL,

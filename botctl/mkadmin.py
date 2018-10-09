@@ -18,7 +18,9 @@ class AdminMakerCommand(BotClientCommand):
         for user in bot['users']:
             if user['email'] == users_email:
                 if user['role'] == 'admin':
-                    sys.stderr.write(f'User {users_email} is an admin already\n')
+                    sys.stderr.write(
+                        f'User {users_email} is an admin already\n'
+                    )
                     return 1
 
                 self.client.make_admin(bot['id'], user['id'])
