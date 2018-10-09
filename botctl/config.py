@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -57,6 +58,13 @@ class ConfigStore:
         raw_environment = self._config[SYSTEM_SECTION]['environment']
         return PlatformEnvironment(raw_environment)
 
+    def get_integration_config(self, integration_name):
+        integration_slot = f'integration/{integration_name}'
+        environment = self.get_environment()
+        return json.loads(
+            self._config[environment.value][integration_slot]
+        )
+
     def get_value(self, environment, variable):
         try:
             return self._config[environment.value][variable.value]
@@ -78,3 +86,8 @@ class ConfigStore:
 
     def set_environment(self, environment):
         self._config[SYSTEM_SECTION]['environment'] = environment.value
+
+    def set_integration_config(self, integration_name, integration_config):
+        integration_slot = f'integration/{integration_name}'
+        environment = self.get_environment()
+        self._config[environment.value][integration_slot] = integration_config

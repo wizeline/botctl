@@ -33,6 +33,7 @@ class InstallIntegrationCommand(BotClientCommand):
                                             integration_name,
                                             integration)
 
+
 class InstallNLP(BotClientCommand):
     """Usage:
     $ botmod install-nlp {BOT_NAME} < NLP_CONFIG.json
@@ -75,6 +76,7 @@ class UninviteUserCommand(BotClientCommand):
 
         sys.stderr.write(f'Not a bot user: [{bot_name}] [{users_email}]\n')
         return 1
+
 
 def main():
     config = ConfigStore()
