@@ -1,7 +1,7 @@
 import sys
 
 from botctl.client import BotClientCommand
-from botctl.common import command_callback
+from botctl.common import command_callback, display_manual
 from botctl.config import ConfigStore
 
 
@@ -15,10 +15,11 @@ class BotKiller(BotClientCommand):
 
 
 def main():
-    command = BotKiller(ConfigStore())
     if len(sys.argv) < 2:
-        print(command.help())
+        display_manual('rmbot')
         sys.exit(1)
+
+    command = BotKiller(ConfigStore())
 
     for bot_name in sys.argv[1:]:
         command(bot_name)

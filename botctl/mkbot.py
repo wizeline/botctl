@@ -1,7 +1,7 @@
 import sys
 
 from botctl.client import BotClientCommand
-from botctl.common import command_callback
+from botctl.common import command_callback, display_manual
 from botctl.config import ConfigStore
 
 
@@ -15,12 +15,13 @@ class BotMaker(BotClientCommand):
 
 
 def main():
-    command = BotMaker(ConfigStore())
     if len(sys.argv) < 2:
-        print(command.help())
+        display_manual('mkbot')
         sys.exit(1)
+    else:
+        command = BotMaker(ConfigStore())
 
-    for bot_name in sys.argv[1:]:
-        command(bot_name)
+        for bot_name in sys.argv[1:]:
+            command(bot_name)
 
     sys.exit(0)

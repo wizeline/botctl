@@ -1,6 +1,9 @@
 import logging
+import os
+import subprocess
 import sys
 
+from botctl.config import ConfigStore
 from botctl.errors import BotControlError
 from botctl.types import PlatformEnvironment, PlatformVariable
 
@@ -42,3 +45,37 @@ def display_help(command):
 
     print(command.help())
     return 0
+
+
+def display_manual(command_name):
+    man_page = os.path.join(os.environ['HOME'],
+                            '.botctl',
+                            'man',
+                            '1',
+                            f'{command_name}.1')
+    subprocess.call(['man', man_page])
+
+
+def execute_subcommand(command_name, **callbacks):
+    if len(sys.argv) == 1:
+        display_manual(command_name)
+        return -1
+
+    subcommand, args = sys.argv[1], sys.argv[2:]
+
+    if subcommand == 'help':
+        display_manual(command_name)
+        return 0
+
+    action_klass = callbacks.get(subcommand)
+    if not action_klass:
+        print(callbacks)
+        display_manual(command_name)
+        return 1
+
+    action = action_klass(ConfigStore())
+    rc = action(*args)
+    if rc != 0:
+        action.help()
+
+    return rc

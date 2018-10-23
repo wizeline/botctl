@@ -5,8 +5,7 @@ import sys
 from json.decoder import JSONDecodeError
 
 from botctl.client import IntegrationClientCommand
-from botctl.common import command_callback
-from botctl.config import ConfigStore
+from botctl.common import command_callback, execute_subcommand
 
 
 class CallIntegrationCommand(IntegrationClientCommand):
@@ -116,7 +115,8 @@ class ShowIntegrationCommand(IntegrationClientCommand):
             return integration, function
 
     def show_function(self, integration_name, function_name):
-        function_spec = self.client.get_function(integration_name, function_name)
+        function_spec = self.client.get_function(integration_name,
+                                                 function_name)
         self.dump_function(integration_name, function_name, function_spec)
         return 0
 
@@ -127,26 +127,10 @@ class ShowIntegrationCommand(IntegrationClientCommand):
 
 
 def main():
-    config = ConfigStore()
     callbacks = {
         'call': CallIntegrationCommand,
         'config': ConfigureIntegrationCommand,
         'list': IntegrationLister,
         'show': ShowIntegrationCommand
     }
-
-    if len(sys.argv) == 1:
-        print('Usage:\n\t$integration [COMMAND] [OPTIONS]'
-              'Commands available:')
-        for command_name in callbacks.keys():
-            print('\t*', command_name)
-        sys.exit(0)
-
-    action, args = sys.argv[1], sys.argv[2:]
-
-    if action not in callbacks:
-        sys.stderr.write(f'Unknown command: {action}')
-        sys.exit(2)
-
-    command = callbacks[action](config)
-    sys.exit(command(*args))
+    return execute_subcommand('integration', **callbacks)

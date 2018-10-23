@@ -1,0 +1,38 @@
+.TH BOTMOD 1
+
+.SH NAME
+botmod \- Modifies the configuration of a bot
+
+.SH SYNOPSIS
+
+.B botctl
+[COMMAND] [OPTIONS]
+
+.SH COMMANDS AVAILABLE
+
+.B install-conversation
+\- uploads a conversation script
+
+.RS
+$ botmod update-conversation BOT_NAME < script.json
+.RE
+
+.B install-integration
+\- install an integration configuration options to a bot
+
+.RS
+$ botmod install-integration BOT_NAME INTEGRATION_NAME < integration-config.json
+.RE
+
+.B install-nlp
+\- install the NLP configuration for a bot
+
+.RS
+$ botmod install-nlp BOT_NAME < nlp-config.json
+.RE
+
+.SH SEE ALSO
+integration(1) botctl(1)
+
+.SH AUTHOR
+Diego Guzman (diego.guzman@wizeline.com)

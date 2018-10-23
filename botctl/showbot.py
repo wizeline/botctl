@@ -1,7 +1,7 @@
 import sys
 
 from botctl.client import BotClientCommand
-from botctl.common import command_callback
+from botctl.common import command_callback, display_manual
 from botctl.config import ConfigStore
 
 
@@ -23,10 +23,10 @@ class ShowBotCommand(BotClientCommand):
 
 
 def main():
-    command = ShowBotCommand(ConfigStore())
     if len(sys.argv) != 2:
-        print(command.help())
+        display_manual('showbot')
         sys.exit(1)
 
+    command = ShowBotCommand(ConfigStore())
     bot_name = sys.argv[1]
     sys.exit(command(bot_name))

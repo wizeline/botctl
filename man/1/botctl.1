@@ -1,0 +1,72 @@
+.TH BOTCTL 1
+
+.SH NAME
+botctl \- configure and select Bots Platform environments
+
+.SH SYNOPSIS
+
+.B botctl
+[COMMAND] [OPTIONS]
+
+.SH COMMANDS AVAILABLE
+
+.B set
+Set a variable
+.RS
+$ botctl set token ${YOUR_ACCESS_TOKEN}
+.RE
+
+.B get
+Get the value of a variable
+.RS
+$ botctl get integrations
+.RE
+.RS
+http://localhost:8002
+.RE
+
+.B del
+Clears a variable
+.RS
+$ botctl del api_secret
+.RE
+
+.B chenv
+Change the active environment section
+
+.RS
+$ botctl chenv local
+.RE
+.RS
+$ botctl chenv development
+.RE
+.RS
+$ botctl chenv staging
+.RE
+.RS
+$ botctl chenv production
+.RE
+
+.SH VALID VARIABLES
+
+This is the list of valid variables
+
+.B cms
+Stores the URL to the Bot CMS backend service
+
+.B integrations
+Stores the URL to the Bot Integrations Manager service
+
+.B token
+Stores the access token to the Bots Platform
+
+.B api_secret
+Stores the internal api secret. Useful to perform operations on the integrations manager. See
+.BR integration (1)
+command for details
+
+.SH SEE ALSO
+integration(1) lsbot(1) mkbot(1) rmbot(1) botmod(1)
+
+.SH AUTHOR
+Diego Guzman (diego.guzman@wizeline.com)

@@ -79,7 +79,7 @@ Usage:
 $ botmod install-integration BOT_NAME INTEGRATION_NAME < integration-config.json
 ```
 ```sh
-$ botmod update-conversation BOT_NAME < conversation-script.json
+$ botmod install-conversation BOT_NAME < conversation-script.json
 ```
 ```sh
 $ botmod install-nlp BOT_NAME < nlp-configuration.json
@@ -93,4 +93,13 @@ nlp-configuration.json looks like:
   "subscription_key": "string",
   "env": "string"
 }
+```
+
+### botusr
+
+```
+$ botusr invite BOT_NAME USER_EMAIL
+```
+```
+$ botusr uninvite BOT_NAME USER_EMAIL
 ```

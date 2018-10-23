@@ -1,0 +1,39 @@
+.TH MKBOT 1
+
+.SH NAME
+mkbot \- Create a bot
+
+.SH SYNOPSIS
+
+.B mkbot
+BOT_NAME
+
+.SH DESCRIPTION
+Creates a bot on the environment selected by
+.BR botctl (1)
+command.
+
+.RS
+$ botctl chenv local
+.RE
+
+It requires to use 
+.BR botctl (1)
+to set the
+.B cms
+and
+.B token
+variables
+
+.RS
+$ botctl set cms YOUR_CMS_URL
+.RE
+.RS
+$ botctl set token YOUR_ACCESS_TOKEN
+.RE
+
+.SH SEE ALSO
+integration(1) showbot(1) mkbot(1) rmbot(1) botmod(1)
+
+.SH AUTHOR
+Diego Guzman (diego.guzman@wizeline.com)

@@ -13,6 +13,7 @@ class BotLister(BotClientCommand):
     def __call__(self):
         for bot in self.client.get_bots():
             self.dump_bot_name(bot)
+        return 0
 
 
 def main():
