@@ -67,8 +67,9 @@ def execute_subcommand(command_name, **callbacks):
         display_manual(command_name)
         return 0
 
-    action_klass = callbacks.get(command_name)
+    action_klass = callbacks.get(subcommand)
     if not action_klass:
+        print(callbacks)
         display_manual(command_name)
         return 1
 

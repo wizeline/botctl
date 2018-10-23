@@ -104,6 +104,11 @@ class BotClient:
         if not response.ok:
             print(response.status_code, response.text)
 
+    def get_bot_integrations(self, bot):
+        bot_id = bot.get('id')
+        url = f'/bots/{bot_id}/integrations'
+        return self._gateway.get(url)
+
 
 class BotClientCommand(BotControlCommand):
     def set_up(self):
@@ -112,17 +117,25 @@ class BotClientCommand(BotControlCommand):
     def dump_bot_name(self, bot):
         print(bot.get('name'))
 
-    def dump_bot(self, bot):
-        name = bot['name']
-        bot_id = bot['id']
-        bot_header = f'name: {name}\nid: {bot_id}\n'
+    def get_users_table(self, bot):
         users = map(
             lambda u: f"- {u['email']} ({u['role']})", bot.get('users', [])
         )
-        users_table = '\n'.join(users)
+        return '\n'.join(users)
 
-        print(bot_header)
-        print(f'Users:\n{users_table}')
+    def get_integrations_table(self, bot):
+        integrations = map(
+            lambda i: f'- {i["name"]} '
+                      f'{json.dumps(i["configuration"], indent=2)}',
+            self.client.get_bot_integrations(bot).json()
+        )
+        return '\n\n'.join(integrations)
+
+    def dump_bot(self, bot):
+        name = bot['name']
+        bot_id = bot['id']
+        print(f'name: {name}\nid: {bot_id}')
+        print(f'Integrations:\n{self.get_integrations_table(bot)}')
 
 
 class IntegrationClient:
@@ -183,7 +196,6 @@ class IntegrationClientCommand(BotControlCommand):
         self._dump_function_names(integration_spec)
 
     def dump_function(self, integration_name, function_name, function_spec):
-        desc = function_spec['description']
         params = function_spec['params']
 
         line_format = '{name:20}  {param_type:5}  {desc}'

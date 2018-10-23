@@ -115,7 +115,8 @@ class ShowIntegrationCommand(IntegrationClientCommand):
             return integration, function
 
     def show_function(self, integration_name, function_name):
-        function_spec = self.client.get_function(integration_name, function_name)
+        function_spec = self.client.get_function(integration_name,
+                                                 function_name)
         self.dump_function(integration_name, function_name, function_spec)
         return 0
 

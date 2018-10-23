@@ -4,7 +4,7 @@ from botctl.client import BotClientCommand
 from botctl.common import command_callback, execute_subcommand
 
 
-class UpdateConversationCommand(BotClientCommand):
+class InstallConversationCommand(BotClientCommand):
     """Usage:
     $ botmod update-conversation {BOT_NAME} < CONVERSATION_FILE.json
     """
@@ -15,6 +15,7 @@ class UpdateConversationCommand(BotClientCommand):
     def __call__(self, bot_name):
         conversation = sys.stdin.read()
         self.client.post_conversation(bot_name, conversation)
+        return 0
 
 
 class InstallIntegrationCommand(BotClientCommand):
@@ -31,6 +32,7 @@ class InstallIntegrationCommand(BotClientCommand):
         self.client.install_bot_integration(bot_name,
                                             integration_name,
                                             integration)
+        return 0
 
 
 class InstallNLP(BotClientCommand):
@@ -44,45 +46,13 @@ class InstallNLP(BotClientCommand):
         nlp_config = sys.stdin.read()
         print(nlp_config)
         self.client.install_nlp(bot_name, nlp_config)
-
-
-class InviteUserCommand(BotClientCommand):
-    """Usage:
-    $ botmod invite {BOT_NAME} {USERS_EMAIL}
-    """
-
-    __commandname__ = 'botmod'
-
-    @command_callback
-    def __call__(self, bot_name, users_email):
-        bot = self.client.get_by_name(bot_name)
-        self.client.invite_user(bot['id'], users_email)
-
-
-class UninviteUserCommand(BotClientCommand):
-    """Usage
-    $ botmod uninvite {BOT_NAME} {USERS_EMAIL}
-    """
-    __commandname__ = 'botmod'
-
-    @command_callback
-    def __call__(self, bot_name, users_email):
-        bot = self.client.get_by_name(bot_name)
-        for user in bot['users']:
-            if users_email == user['email']:
-                self.client.uninvite_user(bot['id'], user['id'])
-                return 0
-
-        sys.stderr.write(f'Not a bot user: [{bot_name}] [{users_email}]\n')
-        return 1
+        return 0
 
 
 def main():
     callbacks = {
-        'install-conversation': UpdateConversationCommand,
+        'install-conversation': InstallConversationCommand,
         'install-integration': InstallIntegrationCommand,
-        'install-nlp': InstallNLP,
-        'invite': InviteUserCommand,
-        'uninvite': UninviteUserCommand
+        'install-nlp': InstallNLP
     }
     return execute_subcommand('botmod', **callbacks)

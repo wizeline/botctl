@@ -32,7 +32,7 @@ def main():
     if len(sys.argv) != 3:
         display_manual('rmadmin')
     else:
-        command = AdminMakerCommand(ConfigStore())
+        command = AdminDestroyerCommand(ConfigStore())
         rc = command(sys.argv[1], sys.argv[2])
         if rc != 0:
             command.help()
