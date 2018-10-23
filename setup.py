@@ -1,15 +1,17 @@
+import os
 import re
 
+from distutils import dir_util
 from setuptools import setup, find_packages
 
 
-def requirements(filename):
-    with open(filename) as file:
+def requirements(file_name):
+    with open(file_name) as requirements_file:
         return [req for req in map(
             lambda line: line.strip(),
             filter(
                 lambda line: not line.startswith('#'),
-                file.readlines()
+                requirements_file.readlines()
             )
         )]
 
@@ -19,6 +21,10 @@ def get_property(prop):
         prop_regex = r'__{}__\s*=\s*[\'"](.+)[\'"]'.format(prop)
         return re.search(prop_regex, f.read(), re.MULTILINE).group(1)
 
+def install_manual():
+    source_manpath = os.path.join(os.path.dirname(__file__), 'man')
+    target_manpath = os.path.join(os.environ['HOME'], '.botctl/man')
+    dir_util.copy_tree(source_manpath, target_manpath)
 
 if __name__ == '__main__':
     package_name = get_property('name')
@@ -46,7 +52,6 @@ if __name__ == '__main__':
         install_requires=requirements('install-requirements.txt'),
         entry_points={
             "console_scripts": [
-                "hibot = botctl.hibot:main",
                 "lsbot = botctl.lsbot:main",
                 "mkadmin = botctl.mkadmin:main",
                 "mkbot = botctl.mkbot:main",
@@ -59,3 +64,4 @@ if __name__ == '__main__':
             ]
         }
     )
+    install_manual()

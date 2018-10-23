@@ -1,6 +1,6 @@
 import sys
 
-from botctl.common import command_callback
+from botctl.common import command_callback, display_manual
 from botctl.config import ConfigStore
 from botctl.client import BotClientCommand
 
@@ -30,6 +30,11 @@ class AdminMakerCommand(BotClientCommand):
 
 
 def main():
-    command = AdminMakerCommand(ConfigStore())
-    rc = command(sys.argv[1], sys.argv[2])
-    sys.exit(rc)
+    if len(sys.argv) != 3:
+        display_manual('mkadmin')
+    else:
+        command = AdminMakerCommand(ConfigStore())
+        rc = command(sys.argv[1], sys.argv[2])
+        if rc != 0:
+            command.help()
+        sys.exit(rc)

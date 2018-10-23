@@ -1,0 +1,62 @@
+.TH INTEGRATION 1
+
+.SH NAME
+integration \- Integrations Manager client
+
+.SH SYNOPSIS
+
+.B integration
+[COMMAND] [OPTIONS]
+
+.SH DESCRIPTION
+The
+.B integration
+command is a client for Bot Integrations Manager. It requires to use
+.BR botctl (1)
+to set the
+.B integrations
+and
+.B api_secret
+variables
+
+.RS
+$ botctl set integrations http://localhost:8002
+.RE
+.RS
+$ botctl set api_secret secret
+.RE
+
+.SH COMMANDS AVAILABLE
+
+.B config
+configures an integration to be called directly, reading the configuration from standard input
+.RS
+$ integration config ${INTEGRATION_NAME} < ${INTEGRATION_CONFIG}
+.RE
+
+.B list
+shows the list of integrations available
+.RS
+$ integration list
+.RE
+
+.B show
+displays details about an integration or function
+.RS
+$ integration show ${INTEGRATION_NAME}
+.RE
+.RS
+$ integration show ${INTEGRATION_NAME}.${FUNCTION_NAME}
+.RE
+
+.B call
+calls an integration function, reading the function arguments from standard input
+.RS
+$ integration call ${INTEGRATION_NAME}.${INTEGRATIO_FUNCTION} < ${ARGUMENTS}
+.RE
+
+.SH SEE ALSO
+botctl(1)
+
+.SH AUTHOR
+Diego Guzman (diego.guzman@wizeline.com)

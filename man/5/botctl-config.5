@@ -1,0 +1,37 @@
+.TH BOTCTL-CONFIG 5
+
+.SH NAME
+config.ini \- store parameters to communicate with Bots Platform
+
+.SH SYNOPSIS
+It's a .ini configuration text file to store the parameters to connect with Bots Platform. When
+.BR botctl (1)
+package is installed, this file is generated when any variable is set
+
+The file contents is divided in five seccions: _SYSTEM, LOCAL, DEVELOPMENT, STAGING, and PRODUCTION.
+
+
+.SH ENVIRONMENT SECTIONS
+
+.B LOCAL
+Store parameters for a local environment of bots platform
+
+.B DEVELOPMENT
+Store parameters for development environment of bots platform
+
+.B STAGING
+Store parameters for staging environment of bots platform
+
+.B PRODUCTION
+Store parameters for production environment of bots platform
+
+.B _SYSTEM
+Stores only one property:
+.B environment
+, this value points to the active environment
+
+.SH SEE ALSO
+botctl(1)
+
+.SH AUTHOR
+Diego Guzman (diego.guzman@wizeline.com)

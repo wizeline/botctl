@@ -1,8 +1,7 @@
 import sys
 
 from botctl.client import BotClientCommand
-from botctl.common import command_callback, display_help
-from botctl.config import ConfigStore
+from botctl.common import command_callback, execute_subcommand
 
 
 class UpdateConversationCommand(BotClientCommand):
@@ -10,7 +9,7 @@ class UpdateConversationCommand(BotClientCommand):
     $ botmod update-conversation {BOT_NAME} < CONVERSATION_FILE.json
     """
 
-    __commandname__ = 'update-conversation'
+    __commandname__ = 'botmod'
 
     @command_callback
     def __call__(self, bot_name):
@@ -23,7 +22,7 @@ class InstallIntegrationCommand(BotClientCommand):
     $ botmod install-integration {BOT_NAME} {INTEGRATION_NAME} < CONFIG.json
     """
 
-    __commandname__ = 'install-integration'
+    __commandname__ = 'botmod'
 
     @command_callback
     def __call__(self, bot_name, integration_name):
@@ -38,7 +37,7 @@ class InstallNLP(BotClientCommand):
     """Usage:
     $ botmod install-nlp {BOT_NAME} < NLP_CONFIG.json
     """
-    __commandname__ = 'train'
+    __commandname__ = 'botmod'
 
     @command_callback
     def __call__(self, bot_name):
@@ -52,7 +51,7 @@ class InviteUserCommand(BotClientCommand):
     $ botmod invite {BOT_NAME} {USERS_EMAIL}
     """
 
-    __commandname__ = 'invite'
+    __commandname__ = 'botmod'
 
     @command_callback
     def __call__(self, bot_name, users_email):
@@ -64,7 +63,7 @@ class UninviteUserCommand(BotClientCommand):
     """Usage
     $ botmod uninvite {BOT_NAME} {USERS_EMAIL}
     """
-    __commandname__ = 'uninvite'
+    __commandname__ = 'botmod'
 
     @command_callback
     def __call__(self, bot_name, users_email):
@@ -79,31 +78,11 @@ class UninviteUserCommand(BotClientCommand):
 
 
 def main():
-    config = ConfigStore()
     callbacks = {
-        'update-conversation': UpdateConversationCommand(config),
-        'install-integration': InstallIntegrationCommand(config),
-        'install-nlp': InstallNLP(config),
-        'invite': InviteUserCommand(config),
-        'uninvite': UninviteUserCommand(config)
+        'install-conversation': UpdateConversationCommand,
+        'install-integration': InstallIntegrationCommand,
+        'install-nlp': InstallNLP,
+        'invite': InviteUserCommand,
+        'uninvite': UninviteUserCommand
     }
-
-    if len(sys.argv) == 1:
-        print('Usage:\n\t$ botmod [COMMAND] [OPTIONS]\n\n'
-              'Commands available:')
-        for command_name in callbacks.keys():
-            print('\t*', command_name)
-        sys.exit(0)
-
-    command, args = sys.argv[1], sys.argv[2:]
-
-    if command == 'help':
-        action = callbacks.get(args[0])
-        sys.exit(display_help(callbacks.get(args[0])))
-
-    else:
-        action = callbacks.get(command)
-        if action is None:
-            sys.stderr.write('Unknown command\n')
-            sys.exit(2)
-        sys.exit(action(*args))
+    return execute_subcommand('botmod', **callbacks)
