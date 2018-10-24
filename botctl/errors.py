@@ -2,6 +2,14 @@ class BotControlError(Exception):
     pass
 
 
+class BotNotFound(BotControlError):
+    def __init__(self, bot_name):
+        super(BotNotFound, self).__init__(bot_name)
+
+    def __str__(self):
+        return f'Bot not found: "{self.args[0]}"'
+
+
 class UndefinedConfigSection(BotControlError):
     def __init__(self, section):
         self.section = section
@@ -19,10 +27,7 @@ class GatewayError(BotControlError):
         self.response = response
 
     def __str__(self):
-        code = self.response.status_code
-        url = self.response.request.url
-        body = self.response.text
-        return f'Request failed. status [{code}] url [{url}] response [{body}]'
+        return self.response.json()['message']
 
 
 class TokenExpiredError(GatewayError):

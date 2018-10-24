@@ -3,6 +3,7 @@ import sys
 
 from datetime import datetime
 
+from botctl.errors import BotNotFound
 from botctl.gateway import BotCMSGateway, BotIntegrationsGateway
 from botctl.types import BotControlCommand
 
@@ -24,6 +25,8 @@ class BotClient:
                     bot.update({'users': users})
 
                 return bot
+
+        raise BotNotFound(bot_name)
 
     def make_admin(self, bot_id, user_id):
         self.set_user_role(bot_id, user_id, 'admin')
