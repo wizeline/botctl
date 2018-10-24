@@ -30,9 +30,6 @@ class Gateway:
             raise TokenExpiredError(response)
 
         if (fail, response.ok) == (True, False):
-            sys.stderr.write(f'Request failed: {response.status_code}\n'
-                             f'Response body: {response.text}\n'
-                             f'request body: {response.request.body}')
             raise GatewayError(response)
 
         return response

@@ -32,11 +32,7 @@ class InviteUserCommand(BotClientCommand):
 
     @command_callback
     def __call__(self, bot_name, users_email):
-        bot = self.client.get_by_name(bot_name)
-        if not bot:
-            sys.stderr.write(f'Bot not found: {bot_name}\n')
-            return 1
-        self.client.invite_user(bot['id'], users_email)
+        self.client.invite_user(bot_name, users_email)
         return 0
 
 
