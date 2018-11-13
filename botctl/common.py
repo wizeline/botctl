@@ -3,8 +3,8 @@ import os
 import subprocess
 import sys
 
+from botctl import errors
 from botctl.config import ConfigStore
-from botctl.errors import BotControlError
 from botctl.types import PlatformEnvironment, PlatformVariable
 
 
@@ -16,8 +16,7 @@ def command_callback(callback):
         try:
             rc = callback(*args, **kwargs)
 
-        except BotControlError as expected_error:
-            logger.debug(expected_error)
+        except errors.BotControlError as expected_error:
             sys.stderr.write(f'{expected_error}\n')
             rc = -1
 
@@ -28,8 +27,22 @@ def command_callback(callback):
 
 def parse_variable(config, raw_variable):
     if '/' in raw_variable:
-        prefix, str_variable = raw_variable.split('/')
-        environment = PlatformEnvironment(prefix.upper())
+        tokens = raw_variable.split('/')
+
+        if len(tokens) != 2:
+            raise errors.InvalidVariableName(raw_variable)
+
+        prefix, str_variable = tokens
+        environment_name = prefix.upper()
+
+        if not PlatformEnvironment.is_valid(environment_name):
+            raise errors.InvalidPlatformEnvironment(prefix)
+
+        if not PlatformVariable.is_valid(str_variable):
+            raise errors.InvalidVariableName(str_variable)
+
+        environment = PlatformEnvironment(environment_name)
+
         variable = PlatformVariable(str_variable)
     else:
         environment = config.get_environment()

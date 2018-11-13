@@ -2,7 +2,7 @@ import sys
 
 import requests
 
-from botctl.errors import GatewayError, TokenExpiredError
+from botctl import errors
 from botctl.types import PlatformVariable
 
 
@@ -18,13 +18,18 @@ class Gateway:
 
     def _request(self, method, endpoint, headers, data, json, fail):
         self._headers.update(headers)
-        response = requests.request(
-            method,
-            self._host + endpoint,
-            headers=self._headers,
-            data=data,
-            json=json
-        )
+        try:
+            response = requests.request(
+                method,
+                self._host + endpoint,
+                headers=self._headers,
+                data=data,
+                json=json
+            )
+        except requests.exceptions.MissingSchema:
+            raise errors.InvalidRemoteHost(self._host)
+        except requests.exceptions.ConnectionError:
+            raise errors.GatewayConnectionError(self._host)
 
         if response.status_code == 401:
             raise TokenExpiredError(response)
