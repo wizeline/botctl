@@ -3,6 +3,7 @@ import sys
 from botctl.client import BotClientCommand
 from botctl.common import command_callback
 from botctl.config import ConfigStore
+from botctl.errors import BotControlError
 
 
 class BotLister(BotClientCommand):
@@ -17,7 +18,11 @@ class BotLister(BotClientCommand):
 
 
 def main():
-    command = BotLister(ConfigStore())
+    try:
+        command = BotLister(ConfigStore())
+    except BotControlError as error:
+        sys.stderr.write(f'{error}\n')
+        sys.exit(1)
 
     if len(sys.argv) > 1:
         print(command.help())

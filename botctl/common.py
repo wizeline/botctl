@@ -1,25 +1,42 @@
+import re
 import logging
 import os
 import subprocess
 import sys
 
+from botctl import errors
 from botctl.config import ConfigStore
-from botctl.errors import BotControlError
 from botctl.types import PlatformEnvironment, PlatformVariable
 
 
 logger = logging.getLogger(__name__)
 
 
-def command_callback(callback):
-    def callback_wrapper(*args, **kwargs):
-        try:
-            rc = callback(*args, **kwargs)
+def is_usage_error(error):
+    matches = re.match(
+        '__call__\(\) missing .* required positional argument',
+        str(error)
+    )
 
-        except BotControlError as expected_error:
-            logger.debug(expected_error)
+    return matches is not None
+
+
+def command_callback(callback):
+    def callback_wrapper(this, *args, **kwargs):
+        try:
+            rc = callback(this, *args, **kwargs)
+
+        except errors.BotControlError as expected_error:
             sys.stderr.write(f'{expected_error}\n')
             rc = -1
+
+        except TypeError as error:
+
+            if is_usage_error(error):
+                display_help(this)
+                rc = -2
+            else:
+                raise error
 
         return rc
 
@@ -28,8 +45,22 @@ def command_callback(callback):
 
 def parse_variable(config, raw_variable):
     if '/' in raw_variable:
-        prefix, str_variable = raw_variable.split('/')
-        environment = PlatformEnvironment(prefix.upper())
+        tokens = raw_variable.split('/')
+
+        if len(tokens) != 2:
+            raise errors.InvalidVariableName(raw_variable)
+
+        prefix, str_variable = tokens
+        environment_name = prefix.upper()
+
+        if not PlatformEnvironment.is_valid(environment_name):
+            raise errors.InvalidPlatformEnvironment(prefix)
+
+        if not PlatformVariable.is_valid(str_variable):
+            raise errors.InvalidVariableName(str_variable)
+
+        environment = PlatformEnvironment(environment_name)
+
         variable = PlatformVariable(str_variable)
     else:
         environment = config.get_environment()

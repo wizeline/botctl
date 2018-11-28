@@ -66,14 +66,15 @@ class ConfigStore:
         )
 
     def get_value(self, environment, variable):
-        try:
-            return self._config[environment.value][variable.value]
-        except KeyError as ex:
-            missing_key = ex.args[0]
-            if missing_key == environment.value:
-                raise UndefinedConfigSection(missing_key)
-            else:
-                raise UndefinedConfigValue(environment, missing_key)
+        if not self.has_environment(environment):
+            raise UndefinedConfigSection(environment.value)
+
+        values = self._config[environment.value]
+
+        if variable.value not in values:
+            raise UndefinedConfigValue(environment, variable)
+
+        return self._config[environment.value][variable.value]
 
     def has_environment(self, environment):
         return self._config.has_section(environment.value)

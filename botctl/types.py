@@ -6,6 +6,10 @@ class BotControlEnum(Enum):
     def values(cls):
         return cls.__members__.values()
 
+    @classmethod
+    def is_valid(cls, name):
+        return name in cls.__members__.keys()
+
 
 class PlatformEnvironment(BotControlEnum):
     LOCAL = 'LOCAL'
@@ -32,7 +36,9 @@ class BotControlCommand:
         self.set_up()
 
     def __call__(self):
-        raise NotImplementedError(f'{self.__commandname__} is not implemented')
+        raise NotImplementedError(
+            f'{self.__commandname__} is not implemented'
+        )
 
     def help(self):
         return self.__doc__
