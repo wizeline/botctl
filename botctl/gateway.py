@@ -32,10 +32,10 @@ class Gateway:
             raise errors.GatewayConnectionError(self._host)
 
         if response.status_code == 401:
-            raise TokenExpiredError(response)
+            raise errors.TokenExpiredError(response)
 
         if (fail, response.ok) == (True, False):
-            raise GatewayError(response)
+            raise errors.GatewayError(response)
 
         return response
 

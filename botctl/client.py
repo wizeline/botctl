@@ -121,24 +121,28 @@ class BotClientCommand(BotControlCommand):
         print(bot.get('name'))
 
     def get_users_table(self, bot):
+        user_format = '{:40}  {}'
+        header = user_format.format('EMAIL', 'ROLE') + '\n' + \
+            user_format.format(40*'-', 10 *'-')
         users = map(
-            lambda u: f"- {u['email']} ({u['role']})", bot.get('users', [])
+            lambda u: user_format.format(u['email'], u['role']),
+            bot.get('users', [])
         )
-        return '\n'.join(users)
+
+        return header + '\n' + '\n'.join(users)
 
     def get_integrations_table(self, bot):
         integrations = map(
-            lambda i: f'- {i["name"]} '
-                      f'{json.dumps(i["configuration"], indent=2)}',
-            self.client.get_bot_integrations(bot).json()
+            lambda i: i['name'], self.client.get_bot_integrations(bot).json()
         )
-        return '\n\n'.join(integrations)
+        return '\n'.join(integrations)
 
     def dump_bot(self, bot):
         name = bot['name']
         bot_id = bot['id']
-        print(f'name: {name}\nid: {bot_id}')
-        print(f'Integrations:\n{self.get_integrations_table(bot)}')
+        print(f'Bot: {name} (ID: {bot_id})\n')
+        print(f'INTEGRATIONS\n{self.get_integrations_table(bot)}\n')
+        print(f'USERS\n{self.get_users_table(bot)}')
 
 
 class IntegrationClient:
@@ -201,16 +205,19 @@ class IntegrationClientCommand(BotControlCommand):
     def dump_function(self, integration_name, function_name, function_spec):
         params = function_spec['params']
 
-        line_format = '{name:20}  {param_type:5}  {desc}'
+        line_format = '{name:20}  {param_type:5} {required:^8}  {desc}'
         print(f'FUNCTION: {integration_name}.{function_name}()\n')
         print(line_format.format(
             name='PARAMETER',
             param_type='TYPE',
+            required='REQUIRED',
             desc='DESCRIPTION'
         ))
         for name, value in params.items():
+            str_required = '*' if value['is_required'] else ' '
             print(line_format.format(
                 name=name,
                 param_type=value['type'],
+                required=str_required,
                 desc=value['description']
             ))

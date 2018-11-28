@@ -54,7 +54,15 @@ class GatewayError(BotControlError):
         self.response = response
 
     def __str__(self):
-        return self.response.json()['message']
+        response_payload = self.response.json()
+        if 'message' in response_payload:
+            return response_payload['message']
+
+        if 'code' in response_payload:
+            return (f"Request failed with status {response_payload['status']}: "
+                    f"{response_payload['code']}")
+
+        return self.response.text
 
 
 class InvalidRemoteHost(GatewayError):
@@ -70,6 +78,7 @@ class GatewayConnectionError(GatewayError):
 
     def __str__(self):
         return f'Could not connect to host {self.host}'
+
 
 class TokenExpiredError(GatewayError):
     def __str__(self):

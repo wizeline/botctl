@@ -1,3 +1,4 @@
+import re
 import logging
 import os
 import subprocess
@@ -11,14 +12,31 @@ from botctl.types import PlatformEnvironment, PlatformVariable
 logger = logging.getLogger(__name__)
 
 
+def is_usage_error(error):
+    matches = re.match(
+        '__call__\(\) missing .* required positional argument',
+        str(error)
+    )
+
+    return matches is not None
+
+
 def command_callback(callback):
-    def callback_wrapper(*args, **kwargs):
+    def callback_wrapper(this, *args, **kwargs):
         try:
-            rc = callback(*args, **kwargs)
+            rc = callback(this, *args, **kwargs)
 
         except errors.BotControlError as expected_error:
             sys.stderr.write(f'{expected_error}\n')
             rc = -1
+
+        except TypeError as error:
+
+            if is_usage_error(error):
+                display_help(this)
+                rc = -2
+            else:
+                raise error
 
         return rc
 
