@@ -30,6 +30,7 @@ class PlatformVariable(BotControlEnum):
 
 class BotControlCommand:
     __commandname__ = 'command'
+    expects_input = False
 
     def __init__(self, config):
         self.config = config

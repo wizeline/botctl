@@ -70,11 +70,10 @@ class BotClient:
         response = self._gateway.post(url, data=conversation, fail=False)
         if not response.ok:
             # Now de platform expects the name of the script file
-            parsed_conversation = json.loads(conversation)
             time_stamp = datetime.utcnow().timestamp()
             body = {
                 'name': f'{time_stamp}-{bot_name}-script.json',
-                'script': json.dumps(parsed_conversation)
+                'script': json.dumps(conversation)
             }
             response = self._gateway.post(url, json=body)
 
@@ -87,12 +86,11 @@ class BotClient:
         bot_id = bot.get('id')
 
         url = f'/bots/{bot_id}/integrations/{integration_name}/install'
-        request_body = json.loads(integration_config)
-        response = self._gateway.post(url, json=request_body, fail=False)
+        response = self._gateway.post(url, json=integration_config, fail=False)
 
         if response.status_code == 409:
             url = f'/bots/{bot_id}/integrations/{integration_name}'
-            response = self._gateway.put(url, json=request_body)
+            response = self._gateway.put(url, json=integration_config)
 
         if not response.ok:
             sys.stderr.write((f'Could not install {integration_name} '
@@ -123,7 +121,7 @@ class BotClientCommand(BotControlCommand):
     def get_users_table(self, bot):
         user_format = '{:40}  {}'
         header = user_format.format('EMAIL', 'ROLE') + '\n' + \
-            user_format.format(40*'-', 10 *'-')
+            user_format.format(40 * '-', 10 * '-')
         users = map(
             lambda u: user_format.format(u['email'], u['role']),
             bot.get('users', [])

@@ -1,8 +1,10 @@
-import re
+import json
 import logging
 import os
+import re
 import subprocess
 import sys
+import yaml
 
 from botctl import errors
 from botctl.config import ConfigStore
@@ -21,8 +23,30 @@ def is_usage_error(error):
     return matches is not None
 
 
+def parse_input(stream=sys.stdin):
+    input_buffer = stream.read()
+    try:
+        return json.loads(input_buffer)
+    except json.decoder.JSONDecodeError:
+        pass  # The content might be in YAML format
+    except Exception as error:
+        raise errors.BotControlError(
+            f'Unexpected error reading input JSON stream: {error}'
+        )
+
+    try:
+        return yaml.load(input_buffer)
+    except Exception as error:
+        raise errors.BotControlError(
+            f'Unexpected error reading input YAML stream: {error}'
+        )
+
+
 def command_callback(callback):
     def callback_wrapper(this, *args, **kwargs):
+        if this.expects_input:
+            setattr(this, 'input', parse_input())
+
         try:
             rc = callback(this, *args, **kwargs)
 
