@@ -1,5 +1,3 @@
-import sys
-
 from botctl.client import BotClientCommand
 from botctl.common import command_callback, execute_subcommand
 
@@ -10,11 +8,11 @@ class InstallConversationCommand(BotClientCommand):
     """
 
     __commandname__ = 'botmod'
+    expects_input = True
 
     @command_callback
     def __call__(self, bot_name):
-        conversation = sys.stdin.read()
-        self.client.post_conversation(bot_name, conversation)
+        self.client.post_conversation(bot_name, self.input)
         return 0
 
 
@@ -24,14 +22,13 @@ class InstallIntegrationCommand(BotClientCommand):
     """
 
     __commandname__ = 'botmod'
+    expects_input = True
 
     @command_callback
     def __call__(self, bot_name, integration_name):
-        integration = sys.stdin.read()
-        print(integration)
         self.client.install_bot_integration(bot_name,
                                             integration_name,
-                                            integration)
+                                            self.input)
         return 0
 
 
@@ -40,12 +37,11 @@ class InstallNLP(BotClientCommand):
     $ botmod install-nlp {BOT_NAME} < NLP_CONFIG.json
     """
     __commandname__ = 'botmod'
+    expects_input = True
 
     @command_callback
     def __call__(self, bot_name):
-        nlp_config = sys.stdin.read()
-        print(nlp_config)
-        self.client.install_nlp(bot_name, nlp_config)
+        self.client.install_nlp(bot_name, self.input)
         return 0
 
 

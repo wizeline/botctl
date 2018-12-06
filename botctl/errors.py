@@ -59,8 +59,8 @@ class GatewayError(BotControlError):
             return response_payload['message']
 
         if 'code' in response_payload:
-            return (f"Request failed with status {response_payload['status']}: "
-                    f"{response_payload['code']}")
+            return (f"Request failed with status {response_payload['status']}:"
+                    f" {response_payload['code']}")
 
         return self.response.text
 
@@ -71,6 +71,7 @@ class InvalidRemoteHost(GatewayError):
 
     def __str__(self):
         return f'Invalid remote host {self.host}'
+
 
 class GatewayConnectionError(GatewayError):
     def __init__(self, host):
