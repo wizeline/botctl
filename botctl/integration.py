@@ -126,10 +126,31 @@ class ShowIntegrationCommand(IntegrationClientCommand):
         return 0
 
 
+class IntegrationDeployer(IntegrationClientCommand):
+    """Usage:
+    $ integration deploy {INTEGRATION_NAME}
+    """
+
+    __commandname__ = 'integration deploy'
+
+    @command_callback
+    def __call__(self, name):
+        response = self.client.deploy_integration(name)
+        if response.status_code == 200:
+            deployment_id = response.json()['install_id']
+            print(('Integration deployment triggered successfully. '
+                   f'ID: {deployment_id}'))
+            return 0
+        else:
+            print(f'Could not deploy {name} integration: {response.text}')
+            return -1
+
+
 def main():
     callbacks = {
         'call': CallIntegrationCommand,
         'config': ConfigureIntegrationCommand,
+        'deploy': IntegrationDeployer,
         'list': IntegrationLister,
         'show': ShowIntegrationCommand
     }
