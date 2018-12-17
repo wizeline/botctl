@@ -133,5 +133,5 @@ $ integration show ${INTEGRATION_NAME}.${FUNCTION_NAME}
 
 Call an integration's function
 ```
-$ integration call ${INTEGRATION_NAME}.${INTEGRATIO_FUNCTION} < ${ARGUMENTS}
+$ integration call ${INTEGRATION_NAME}.${INTEGRATION_FUNCTION} < ${ARGUMENTS}
 ```
