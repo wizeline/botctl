@@ -147,6 +147,12 @@ class IntegrationClient:
     def __init__(self, gateway):
         self._gateway = gateway
 
+    def deploy_integration(self, integration_name):
+        return self._gateway.post(
+            '/integrations/install',
+            json={'integration_name': integration_name}
+        )
+
     def get_integration(self, integration_name):
         return self._gateway.get(
             f'/integrations/{integration_name}'

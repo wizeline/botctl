@@ -103,3 +103,35 @@ $ botusr invite BOT_NAME USER_EMAIL
 ```
 $ botusr uninvite BOT_NAME USER_EMAIL
 ```
+
+### integration
+
+Configure an integration to use it from the command line
+```
+$ integration config ${INTEGRATION_NAME} < ${INTEGRATION_CONFIG}
+```
+
+List the integrations available
+```
+$ integration list
+```
+
+Deploy the latest changes from an integration
+```
+$ integration deploy ${INTEGRATION_NAME}
+```
+
+Display details of an integration
+```
+$ integration show ${INTEGRATION_NAME}
+```
+
+Display details of an integration's function
+```
+$ integration show ${INTEGRATION_NAME}.${FUNCTION_NAME}
+```
+
+Call an integration's function
+```
+$ integration call ${INTEGRATION_NAME}.${INTEGRATION_FUNCTION} < ${ARGUMENTS}
+```
