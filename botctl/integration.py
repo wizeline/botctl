@@ -104,7 +104,7 @@ class ShowIntegrationCommand(IntegrationClientCommand):
         return rc
 
     def _parse_function_spec(self, spec):
-        match = re.match('(\w+)(\.\w+)?', spec)
+        match = re.match('(\w+)(\.\w+)?', spec)  # noqa
         assert match, f'Not a valid integration or function: {spec}'
         integration, function = match.groups()
 

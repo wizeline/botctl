@@ -15,14 +15,22 @@ class Gateway:
         self._configure_host()
 
     def _request(self, method, endpoint, headers, data, json, fail):
-        self._headers.update(headers)
+        if headers:
+            self._headers.update(headers)
+
+        request_parameters = {'headers': self._headers}
+
+        if data:
+            request_parameters['data'] = data
+
+        if json:
+            request_parameters['json'] = json
+
         try:
             response = requests.request(
                 method,
                 self._host + endpoint,
-                headers=self._headers,
-                data=data,
-                json=json
+                **request_parameters
             )
         except requests.exceptions.MissingSchema:
             raise errors.InvalidRemoteHost(self._host)

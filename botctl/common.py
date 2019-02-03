@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def is_usage_error(error):
     matches = re.match(
-        '__call__\(\) missing .* required positional argument',
+        '__call__\(\) missing .* required positional argument',  # noqa
         str(error)
     )
 
