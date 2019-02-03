@@ -1,3 +1,6 @@
+import json
+
+
 class BotControlError(Exception):
     pass
 
@@ -54,13 +57,18 @@ class GatewayError(BotControlError):
         self.response = response
 
     def __str__(self):
-        response_payload = self.response.json()
-        if 'message' in response_payload:
-            return response_payload['message']
+        try:
+            response_payload = self.response.json()
+            if 'message' in response_payload:
+                return response_payload['message']
 
-        if 'code' in response_payload:
-            return (f"Request failed with status {response_payload['status']}:"
-                    f" {response_payload['code']}")
+            if 'code' in response_payload:
+                return (f"Request failed with status "
+                        f"{response_payload['status']}: "
+                        f"{response_payload['code']}")
+
+        except json.decoder.JSONDecodeError:
+            pass
 
         return self.response.text
 
