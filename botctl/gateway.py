@@ -83,3 +83,10 @@ class BotIntegrationsGateway(Gateway):
             self._environment,
             PlatformVariable.INTEGRATIONS_MANAGER
         )
+
+class BotAnalyticsGateway(Gateway):
+    def _configure_host(self):
+        self._host = self._config.get_value(
+            self._environment,
+            PlatformVariable.ANALYTICS
+        )

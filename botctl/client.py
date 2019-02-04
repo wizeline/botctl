@@ -4,8 +4,105 @@ import sys
 from datetime import datetime
 
 from botctl.errors import BotNotFound
-from botctl.gateway import BotCMSGateway, BotIntegrationsGateway
+from botctl.gateway import (
+    BotAnalyticsGateway,
+    BotCMSGateway,
+    BotIntegrationsGateway
+)
 from botctl.types import BotControlCommand
+
+
+class BotAnalyticsClient:
+    def __init__(self, gateway):
+        self._gateway = gateway
+
+    def get_messages_overview(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/messages/overview'
+        ).json()
+
+    def get_messages_growth(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/messages/growth'
+        ).json()
+
+    def get_most_popular_message(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/messages/most_popular'
+        ).json()
+
+    def get_convesations(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/conversations'
+        ).json()
+
+    def get_broken_convesations(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/conversations/broken'
+        ).json()
+
+    def get_broken_messages(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/messages/broken'
+        ).json()
+
+    def get_broken_messages_count(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/messages/broken/count'
+        ).json()
+
+    def get_users(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/users'
+        ).json()
+
+    def get_users_growth(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/users/growth'
+        ).json()
+
+    def get_most_popular_intent(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/intents/most_popular'
+        ).json()
+
+    def get_intents_dropoff(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/intents/dropoff'
+        ).json()
+
+    def get_most_popular_faqs(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/faqs/most_popular'
+        ).json()
+
+    def get_conversation_breakpoint(self, bot_id):
+        return self._gateway.get(
+            f'/bots/{bot_id}/conversation_breakpoint'
+        ).json()
+
+    def set_nlp_configuration(self, bot_id, nlp_config):
+        return self._gateway.post(
+            f'/bots/{bot_id}/nlp_configuration',
+            json=nlp_config
+        ).json()
+
+    def train_intents(self, bot_id, intents):
+        return self._gateway.post(
+            f'/train/{bot_id}/intents',
+            json=intents
+        ).json()
+
+    def train_bot(self, bot_id, training):
+        return self._gateway.post(
+            f'/train/{bot_id}/intents',
+            json=training
+        ).json()
+
+
+class BotAnalyticsClientcommand(BotControlCommand):
+    def set_up(self):
+        self.client = BotAnalyticsClient(BotAnalyticsGateway(self.config))
 
 
 class BotClient:
