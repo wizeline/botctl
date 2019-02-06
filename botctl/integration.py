@@ -31,7 +31,7 @@ class CallIntegrationCommand(IntegrationClientCommand):
         return {
             'parameters': json.load(sys.stdin),
             'configuration': self.config.get_integration_config(integration),
-            'credentials': ''
+            'credentials': self.config.get_integration_credentials(integration)
         }
 
 
@@ -69,6 +69,38 @@ class ConfigureIntegrationCommand(IntegrationClientCommand):
         self.config.set_integration_config(
             integration_name,
             parsed_config
+        )
+        self.config.commit()
+
+
+class SetIntegrationCredentials(IntegrationClientCommand):
+    """Usage:
+    $ integration set-credentials {INTEGRATION_NAME} < CREDENTIALS.json
+    """
+
+    __commandname__ = 'integration set-credentials'
+
+    @command_callback
+    def __call__(self, integration_name):
+        integration_credentials = sys.stdin.read()
+        try:
+            rc = self._store_integration_credentials(
+                integration_name,
+                integration_credentials
+            )
+        except JSONDecodeError:
+            sys.stderr.write('Integration config must be a JSON document\n')
+            return 1
+        return rc
+
+    def _store_integration_credentials(self,
+                                       integration_name,
+                                       integration_credentials):
+        parsed_credentials = json.loads(integration_credentials)
+
+        self.config.set_integration_credentials(
+            integration_name,
+            parsed_credentials
         )
         self.config.commit()
 
@@ -153,6 +185,7 @@ def main():
         'config': ConfigureIntegrationCommand,
         'deploy': IntegrationDeployer,
         'list': IntegrationLister,
+        'set-credentials': SetIntegrationCredentials,
         'show': ShowIntegrationCommand
     }
     return execute_subcommand('integration', **callbacks)

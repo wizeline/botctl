@@ -34,6 +34,12 @@ configures an integration to be called directly, reading the configuration from 
 $ integration config ${INTEGRATION_NAME} < ${INTEGRATION_CONFIG}
 .RE
 
+.B set-credentials
+stores an integration's credentials, reading them from standard input
+.RS
+$ integration set-credentials ${INTEGRATION_NAME} < ${CREDENTIALS}
+.RE
+
 .B list
 shows the list of integrations available
 .RS
