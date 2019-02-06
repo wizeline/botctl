@@ -40,7 +40,7 @@ class ConfigStore:
 
     def _get_integration_config_slot(self, integration_name):
         environment = self.get_environment()
-        return f'{environment.value}/integrations/{integration_name}'
+        return f'{environment.value}/integrations/{integration_name}/config'
 
     def _get_integration_credentials_slot(self, integration_name):
         environment = self.get_environment()
@@ -74,12 +74,22 @@ class ConfigStore:
         return PlatformEnvironment(raw_environment)
 
     def get_integration_config(self, integration_name):
-        integration_slot = self._get_integration_slot(integration_name)
+        integration_slot = self._get_integration_config_slot(integration_name)
 
-        return {
-            option: self._parse_value(value)
-            for option, value in self._config[integration_slot].items()
-        }
+        if not self.has_section(integration_slot):
+            return {}
+
+        return self.get_values_from_section(integration_slot)
+
+    def get_integration_credentials(self, integration_name):
+        integration_slot = self._get_integration_credentials_slot(
+            integration_name
+        )
+
+        if not self.has_section(integration_slot):
+            return {}
+
+        return self.get_values_from_section(integration_slot)
 
     def get_value(self, environment, variable):
         if not self.has_environment(environment):
@@ -92,8 +102,17 @@ class ConfigStore:
 
         return self._config[environment.value][variable.value]
 
+    def get_values_from_section(self, section):
+        return {
+            option: self._parse_value(value)
+            for option, value in self._config[section].items()
+        }
+
     def has_environment(self, environment):
-        return self._config.has_section(environment.value)
+        return self.has_section(environment.value)
+
+    def has_section(self, section):
+        return self._config.has_section(section)
 
     def put_value(self, environment, variable, value):
         try:
@@ -105,15 +124,25 @@ class ConfigStore:
         self._config[SYSTEM_SECTION]['environment'] = environment.value
 
     def set_integration_config(self, integration_name, integration_config):
-        integration_slot = self._get_integration_slot(integration_name)
+        integration_slot = self._get_integration_config_slot(integration_name)
 
         if not self._config.has_section(integration_slot):
             self._config.add_section(integration_slot)
 
-        for option, value in integration_config.items():
-            try:
-                self._config[integration_slot][option] = str(value)
-            except TypeError as error:
-                print(f'Error: {type(error)}: {error}')
-                print(f'{integration_slot} {option} {value}')
-                raise error
+        self.set_values_at_section(integration_slot, **integration_config)
+
+    def set_integration_credentials(self,
+                                    integration_name,
+                                    integration_credentials):
+        integration_slot = self._get_integration_credentials_slot(
+            integration_name
+        )
+
+        if not self._config.has_section(integration_slot):
+            self._config.add_section(integration_slot)
+
+        self.set_values_at_section(integration_slot, **integration_credentials)
+
+    def set_values_at_section(self, section, **kwvalues):
+        for option, value in kwvalues.items():
+            self._config[section][option] = str(value)
