@@ -1,8 +1,9 @@
 import json
 import logging
 import os
+import re
 
-from configparser import ConfigParser
+from configparser import RawConfigParser
 
 from botctl.errors import (
     UndefinedConfigSection,
@@ -18,7 +19,7 @@ SYSTEM_SECTION = '_SYSTEM'
 
 class ConfigStore:
     def __init__(self):
-        self._config = ConfigParser()
+        self._config = RawConfigParser()
         self._path = os.path.join(__configdir__, 'config.ini')
 
         if os.path.exists(self._path):
@@ -36,6 +37,20 @@ class ConfigStore:
         if not self._config.has_section(SYSTEM_SECTION):
             self._config[SYSTEM_SECTION] = {}
             self.set_environment(PlatformEnvironment.LOCAL)
+
+    def _get_integration_config_slot(self, integration_name):
+        environment = self.get_environment()
+        return f'{environment.value}/integrations/{integration_name}/config'
+
+    def _get_integration_credentials_slot(self, integration_name):
+        environment = self.get_environment()
+        return f'{environment.value}/integrations/{integration_name}/credentials'
+
+    def _parse_value(self, value):
+        try:
+            return int(value)
+        except:
+            return value
 
     def add_environment(self, environment):
         self._config[environment.value] = {}
@@ -59,11 +74,22 @@ class ConfigStore:
         return PlatformEnvironment(raw_environment)
 
     def get_integration_config(self, integration_name):
-        integration_slot = f'integration/{integration_name}'
-        environment = self.get_environment()
-        return json.loads(
-            self._config[environment.value][integration_slot]
+        integration_slot = self._get_integration_config_slot(integration_name)
+
+        if not self.has_section(integration_slot):
+            return {}
+
+        return self.get_values_from_section(integration_slot)
+
+    def get_integration_credentials(self, integration_name):
+        integration_slot = self._get_integration_credentials_slot(
+            integration_name
         )
+
+        if not self.has_section(integration_slot):
+            return {}
+
+        return self.get_values_from_section(integration_slot)
 
     def get_value(self, environment, variable):
         if not self.has_environment(environment):
@@ -76,8 +102,17 @@ class ConfigStore:
 
         return self._config[environment.value][variable.value]
 
+    def get_values_from_section(self, section):
+        return {
+            option: self._parse_value(value)
+            for option, value in self._config[section].items()
+        }
+
     def has_environment(self, environment):
-        return self._config.has_section(environment.value)
+        return self.has_section(environment.value)
+
+    def has_section(self, section):
+        return self._config.has_section(section)
 
     def put_value(self, environment, variable, value):
         try:
@@ -89,6 +124,25 @@ class ConfigStore:
         self._config[SYSTEM_SECTION]['environment'] = environment.value
 
     def set_integration_config(self, integration_name, integration_config):
-        integration_slot = f'integration/{integration_name}'
-        environment = self.get_environment()
-        self._config[environment.value][integration_slot] = integration_config
+        integration_slot = self._get_integration_config_slot(integration_name)
+
+        if not self._config.has_section(integration_slot):
+            self._config.add_section(integration_slot)
+
+        self.set_values_at_section(integration_slot, **integration_config)
+
+    def set_integration_credentials(self,
+                                    integration_name,
+                                    integration_credentials):
+        integration_slot = self._get_integration_credentials_slot(
+            integration_name
+        )
+
+        if not self._config.has_section(integration_slot):
+            self._config.add_section(integration_slot)
+
+        self.set_values_at_section(integration_slot, **integration_credentials)
+
+    def set_values_at_section(self, section, **kwvalues):
+        for option, value in kwvalues.items():
+            self._config[section][option] = str(value)
