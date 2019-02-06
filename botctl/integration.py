@@ -65,9 +65,10 @@ class ConfigureIntegrationCommand(IntegrationClientCommand):
             sys.stdout.write('Configuration mismatch\n\n')
             self._dump_config_options(integration)
             return 1
+
         self.config.set_integration_config(
             integration_name,
-            json.dumps(parsed_config)
+            parsed_config
         )
         self.config.commit()
 

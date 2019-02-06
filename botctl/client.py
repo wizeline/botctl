@@ -101,7 +101,7 @@ class BotClient:
         bot_id = bot.get('id')
 
         url = f'/bots/{bot_id}/nlp_provider/luis'
-        response = self._gateway.post(url, json=json.loads(nlp_config))
+        response = self._gateway.post(url, json=nlp_config)
         if not response.ok:
             print(response.status_code, response.text)
 
