@@ -81,7 +81,7 @@ class IntegrationLister(IntegrationClientCommand):
 
     @command_callback
     def __call__(self, *args):  # Include args to meet the command interface
-        for integration_name in self.client.get_integrations():
+        for integration_name in self.integrations_client.get_integrations():
             print(integration_name)
 
 
@@ -104,7 +104,7 @@ class ShowIntegrationCommand(IntegrationClientCommand):
         return rc
 
     def _parse_function_spec(self, spec):
-        match = re.match('(\w+)(\.\w+)?', spec)
+        match = re.match('(\w+)(\.\w+)?', spec)  # noqa
         assert match, f'Not a valid integration or function: {spec}'
         integration, function = match.groups()
 
@@ -115,13 +115,15 @@ class ShowIntegrationCommand(IntegrationClientCommand):
             return integration, function
 
     def show_function(self, integration_name, function_name):
-        function_spec = self.client.get_function(integration_name,
-                                                 function_name)
+        function_spec = self.integrations_client.get_function(integration_name,
+                                                              function_name)
         self.dump_function(integration_name, function_name, function_spec)
         return 0
 
     def show_integration(self, integration_name):
-        integration = self.client.get_integration(integration_name)
+        integration = self.integrations_client.get_integration(
+            integration_name
+        )
         self.dump_integration(integration)
         return 0
 
@@ -135,7 +137,7 @@ class IntegrationDeployer(IntegrationClientCommand):
 
     @command_callback
     def __call__(self, name):
-        response = self.client.deploy_integration(name)
+        response = self.integrations_client.deploy_integration(name)
         if response.status_code == 200:
             deployment_id = response.json()['install_id']
             print(('Integration deployment triggered successfully. '

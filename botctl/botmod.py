@@ -12,7 +12,7 @@ class InstallConversationCommand(BotClientCommand):
 
     @command_callback
     def __call__(self, bot_name):
-        self.client.post_conversation(bot_name, self.input)
+        self.bot_client.post_conversation(bot_name, self.input)
         return 0
 
 
@@ -26,13 +26,15 @@ class InstallIntegrationCommand(BotClientCommand):
 
     @command_callback
     def __call__(self, bot_name, integration_name):
-        self.client.install_bot_integration(bot_name,
-                                            integration_name,
-                                            self.input)
+        self.bot_client.install_bot_integration(
+            bot_name,
+            integration_name,
+            self.input
+        )
         return 0
 
 
-class InstallNLP(BotClientCommand):
+class InstallNLP(BotClientCommand, BotAnalyticsClientcommand):
     """Usage:
     $ botmod install-nlp {BOT_NAME} < NLP_CONFIG.json
     """
@@ -41,7 +43,11 @@ class InstallNLP(BotClientCommand):
 
     @command_callback
     def __call__(self, bot_name):
-        self.client.install_nlp(bot_name, self.input)
+        bot = self.bot_client.get_by_name(bot_name)
+
+        self.bot_client.install_nlp(bot['id'], self.input)
+        self.analytics_client.install_nlp(bot['id'], self.input)
+
         return 0
 
 

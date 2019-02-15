@@ -81,7 +81,7 @@ class BotAnalyticsClient:
             f'/bots/{bot_id}/conversation_breakpoint'
         ).json()
 
-    def set_nlp_configuration(self, bot_id, nlp_config):
+    def install_nlp(self, bot_id, nlp_config):
         return self._gateway.post(
             f'/bots/{bot_id}/nlp_configuration',
             json=nlp_config
@@ -102,7 +102,9 @@ class BotAnalyticsClient:
 
 class BotAnalyticsClientcommand(BotControlCommand):
     def set_up(self):
-        self.client = BotAnalyticsClient(BotAnalyticsGateway(self.config))
+        self.analytics_client = BotAnalyticsClient(
+            BotAnalyticsGateway(self.config)
+        )
 
 
 class BotClient:
@@ -193,14 +195,9 @@ class BotClient:
             sys.stderr.write((f'Could not install {integration_name} '
                               f'integration on bot {bot_name}\n'))
 
-    def install_nlp(self, bot_name, nlp_config):
-        bot = self.get_by_name(bot_name)
-        bot_id = bot.get('id')
-
+    def install_nlp(self, bot_id, nlp_config):
         url = f'/bots/{bot_id}/nlp_provider/luis'
         response = self._gateway.post(url, json=json.loads(nlp_config))
-        if not response.ok:
-            print(response.status_code, response.text)
 
     def get_bot_integrations(self, bot):
         bot_id = bot.get('id')
@@ -210,7 +207,7 @@ class BotClient:
 
 class BotClientCommand(BotControlCommand):
     def set_up(self):
-        self.client = BotClient(BotCMSGateway(self.config))
+        self.bot_client = BotClient(BotCMSGateway(self.config))
 
     def dump_bot_name(self, bot):
         print(bot.get('name'))
@@ -227,8 +224,9 @@ class BotClientCommand(BotControlCommand):
         return header + '\n' + '\n'.join(users)
 
     def get_integrations_table(self, bot):
+        raw_integrations = self.bot_client.get_bot_integrations(bot).json()
         integrations = map(
-            lambda i: i['name'], self.client.get_bot_integrations(bot).json()
+            lambda i: i['name'], raw_integrations
         )
         return '\n'.join(integrations)
 
@@ -279,7 +277,9 @@ class IntegrationClient:
 
 class IntegrationClientCommand(BotControlCommand):
     def set_up(self):
-        self.client = IntegrationClient(BotIntegrationsGateway(self.config))
+        self.integrations_client = IntegrationClient(
+            BotIntegrationsGateway(self.config)
+        )
 
     def _dump_config_options(self, integration_spec):
         options = integration_spec.get('configuration_options')

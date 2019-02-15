@@ -34,7 +34,7 @@ class Gateway:
             )
         except requests.exceptions.MissingSchema:
             raise errors.InvalidRemoteHost(self._host)
-        except requests.exceptions.ConnectionError as error:
+        except requests.exceptions.ConnectionError:
             raise errors.GatewayConnectionError(self._host)
 
         if response.status_code == 401:
@@ -84,9 +84,16 @@ class BotIntegrationsGateway(Gateway):
             PlatformVariable.INTEGRATIONS_MANAGER
         )
 
+
 class BotAnalyticsGateway(Gateway):
     def _configure_host(self):
         self._host = self._config.get_value(
             self._environment,
             PlatformVariable.ANALYTICS
         )
+        self._headers.update({
+            'Authorization': self._config.get_value(
+                self._environment,
+                PlatformVariable.TOKEN
+            )
+        })
