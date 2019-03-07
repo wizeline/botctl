@@ -34,7 +34,7 @@ class Gateway:
             )
         except requests.exceptions.MissingSchema:
             raise errors.InvalidRemoteHost(self._host)
-        except requests.exceptions.ConnectionError as error:
+        except requests.exceptions.ConnectionError:
             raise errors.GatewayConnectionError(self._host)
 
         if response.status_code == 401:

@@ -22,6 +22,13 @@ def get_property(prop):
         return re.search(prop_regex, f.read(), re.MULTILINE).group(1)
 
 
+def configure():
+    from botctl.config import ConfigStore
+    config_store = ConfigStore()
+    config_store.setup()
+    config_store.commit()
+
+
 def install_manual():
     source_manpath = os.path.join(os.path.dirname(__file__), 'man')
     target_manpath = os.path.join(os.environ['HOME'], '.botctl/man')
@@ -68,3 +75,4 @@ if __name__ == '__main__':
         }
     )
     install_manual()
+    configure()
