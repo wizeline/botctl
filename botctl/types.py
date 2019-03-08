@@ -23,6 +23,7 @@ class PlatformVariable(BotControlEnum):
     API_SECRET = 'api_secret'
     BOT = 'bot'
     CMS = 'cms'
+    FRONTEND = 'frontend'
     INTEGRATIONS_MANAGER = 'integrations'
     OPERATIONS = 'operations'
     TOKEN = 'token'

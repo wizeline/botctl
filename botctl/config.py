@@ -1,7 +1,5 @@
-import json
 import logging
 import os
-import re
 
 from configparser import RawConfigParser
 
@@ -9,7 +7,7 @@ from botctl.errors import (
     UndefinedConfigSection,
     UndefinedConfigValue
 )
-from botctl.types import PlatformEnvironment
+from botctl.types import PlatformEnvironment, PlatformVariable
 
 
 __configdir__ = os.path.join(os.environ['HOME'], '.botctl')
@@ -27,13 +25,13 @@ class ConfigStore:
         elif not os.path.exists(__configdir__):
             os.mkdir(__configdir__)
 
-        self._setup()
+        self._load()
 
         for env in PlatformEnvironment.values():
             if not self.has_environment(env):
                 self.add_environment(env)
 
-    def _setup(self):
+    def _load(self):
         if not self._config.has_section(SYSTEM_SECTION):
             self._config[SYSTEM_SECTION] = {}
             self.set_environment(PlatformEnvironment.LOCAL)
@@ -44,13 +42,81 @@ class ConfigStore:
 
     def _get_integration_credentials_slot(self, integration_name):
         environment = self.get_environment()
-        return f'{environment.value}/integrations/{integration_name}/credentials'
+        return (f'{environment.value}/integrations/'
+                f'{integration_name}/credentials')
 
     def _parse_value(self, value):
         try:
             return int(value)
-        except:
+        except Exception:
             return value
+
+    def _setup_environment(self, environment, values):
+        if not self.has_environment(environment):
+            self.add_environment(environment)
+
+        for variable, value in values.items():
+            self.put_value(environment, variable, value)
+
+    def _setup_local(self):
+        values = {
+            PlatformVariable.FRONTEND: 'http://localhost:8000',
+            PlatformVariable.CMS: 'http://localhost:8001',
+            PlatformVariable.INTEGRATIONS_MANAGER: 'http://localhost:8002',
+            PlatformVariable.OPERATIONS: 'http://localhost:8003',
+        }
+        self._setup_environment(PlatformEnvironment.LOCAL, values)
+
+    def _setup_development(self):
+        values = {
+            PlatformVariable.FRONTEND: (
+                'https://cms-frontend-development.bots-platform.com'
+            ),
+            PlatformVariable.CMS: (
+                'https://cms-backend-development.bots-platform.com'
+            ),
+            PlatformVariable.INTEGRATIONS_MANAGER: (
+                'https://integrations-manager-development.bots-platform.com'
+            ),
+            PlatformVariable.OPERATIONS: (
+                'https://operations-controller-development.bots-platform.com'
+            )
+        }
+        self._setup_environment(PlatformEnvironment.DEVELOPMENT, values)
+
+    def _setup_staging(self):
+        values = {
+            PlatformVariable.FRONTEND: (
+                'https://cms-frontend-staging.bots-platform.com'
+            ),
+            PlatformVariable.CMS: (
+                'https://cms-backend-staging.bots-platform.com'
+            ),
+            PlatformVariable.INTEGRATIONS_MANAGER: (
+                'https://integrations-manager-staging.bots-platform.com'
+            ),
+            PlatformVariable.OPERATIONS: (
+                'https://operations-controller-staging-lb.bots-platform.com'
+            )
+        }
+
+        self._setup_environment(PlatformEnvironment.STAGING, values)
+
+    def _setup_production(self):
+        values = {
+            PlatformVariable.FRONTEND: 'https://bots.wizeline.com',
+            PlatformVariable.CMS: (
+                'https://cms-backend-production.bots-platform.com'
+            ),
+            PlatformVariable.INTEGRATIONS_MANAGER: (
+                'https://integrations-manager-production-lb.bots-platform.com'
+            ),
+            PlatformVariable.OPERATIONS: (
+                'https://bots-api.wizeline.com'
+            )
+        }
+
+        self._setup_environment(PlatformEnvironment.PRODUCTION, values)
 
     def add_environment(self, environment):
         self._config[environment.value] = {}
@@ -146,3 +212,9 @@ class ConfigStore:
     def set_values_at_section(self, section, **kwvalues):
         for option, value in kwvalues.items():
             self._config[section][option] = str(value)
+
+    def setup(self):
+        self._setup_local()
+        self._setup_development()
+        self._setup_staging()
+        self._setup_production()
