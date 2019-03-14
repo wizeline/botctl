@@ -102,6 +102,23 @@ class ConfigStore:
 
         self._setup_environment(PlatformEnvironment.STAGING, values)
 
+    def _setup_performance(self):
+        values = {
+            PlatformVariable.FRONTEND: ( # CMS frontend will be the same AFAIK
+                'https://cms-frontend-development.bots-platform.com'
+            ),
+            PlatformVariable.CMS: (  # CMS backend is coming soon
+                'https://cms-backend-development.bots-platform.com'
+            ),
+            PlatformVariable.INTEGRATIONS_MANAGER: (
+                'https://integrations-manager-performance.bots-platform.com'
+            ),
+            PlatformVariable.OPERATIONS: (
+                'https://operations-controller-performance.bots-platform.com'
+            )
+        }
+        self._setup_environment(PlatformEnvironment.PERFORMANCE, values)
+
     def _setup_production(self):
         values = {
             PlatformVariable.FRONTEND: 'https://bots.wizeline.com',
@@ -217,4 +234,5 @@ class ConfigStore:
         self._setup_local()
         self._setup_development()
         self._setup_staging()
+        self._setup_performance()
         self._setup_production()

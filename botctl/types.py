@@ -15,6 +15,7 @@ class PlatformEnvironment(BotControlEnum):
     LOCAL = 'LOCAL'
     DEVELOPMENT = 'DEVELOPMENT'
     STAGING = 'STAGING'
+    PERFORMANCE = 'PERFORMANCE'
     PRODUCTION = 'PRODUCTION'
 
 
