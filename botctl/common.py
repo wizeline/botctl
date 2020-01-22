@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 import sys
-import yaml
+
 
 from botctl import errors
 from botctl.config import ConfigStore
