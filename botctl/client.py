@@ -94,7 +94,10 @@ class BotClient:
 
         if not response.ok:
             if response.status_code >= 400 and response.status_code <=499:
-                sys.stderr.write((f'Could not install {integration_name} '
+                sys.stderr.write(
+                    f'Could not install {integration_name} '
+                    f'integration on bot {bot_name}...'
+                )
                               f'integration on bot {bot_name} due to errors on the configuration\n'))
             elif response.status_code >= 500:
                 sys.stderr.write((f'Could not install {integration_name} '
