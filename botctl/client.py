@@ -3,7 +3,7 @@ import sys
 
 from datetime import datetime
 
-from botctl.errors import BotNotFound
+from botctl.errors import BotNotFound, UnsupportedBotAttribute
 from botctl.gateway import BotCMSGateway, BotIntegrationsGateway
 from botctl.types import BotControlCommand
 
@@ -109,6 +109,46 @@ class BotClient:
         bot_id = bot.get('id')
         url = f'/bots/{bot_id}/integrations'
         return self._gateway.get(url)
+
+    def get_nlp_configuration(self, bot):
+        bot_id = bot.get('id')
+        url = f'/bots/{bot_id}/nlp_provider'
+        return self._gateway.get(url)
+
+    def get_qna_configuration(self, bot):
+        bot_id = bot.get('id')
+        url = f'/bots/{bot_id}/qna_provider'
+        return self._gateway.get(url)
+
+    def get_admins(self, bot):
+        users = self.get_bot_users_by_id(bot['id'])
+        return [
+            user for user in users
+            if user['role'] == 'admin'
+        ]
+
+    def get_customers(self, bot):
+        users = self.get_bot_users_by_id(bot['id'])
+        return [
+            user for user in users
+            if user['role'] == 'customer'
+        ]
+
+    def get_attribute(self, bot, attribute):
+        if attribute == 'integrations':
+            return self.get_bot_integrations(bot).json()
+        if attribute == 'nlp':
+            return self.get_nlp_configuration(bot).json()
+        if attribute == 'qna':
+            return self.get_qna_configuration(bot).json()
+        if attribute == 'admins':
+            return self.get_admins(bot)
+        if attribute == 'customers':
+            return self.get_customers(bot)
+        if attribute == 'users':
+            return self.get_bot_users_by_id(bot)
+
+        raise UnsupportedBotAttribute(bot, attribute)
 
 
 class BotClientCommand(BotControlCommand):

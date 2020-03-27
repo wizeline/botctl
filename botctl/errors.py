@@ -5,6 +5,17 @@ class BotControlError(Exception):
     pass
 
 
+class UnsupportedBotAttribute(BotControlError):
+    def __init__(self, bot, attribute):
+        super(UnsupportedBotAttribute, self).__init__(
+            bot['name'],
+            bot['id'],
+            attribute
+        )
+
+    def __str__(self):
+        return f'Unsupported bot attribute: "{self.args[0]}.{self.args[2]}"'
+
 class BotNotFound(BotControlError):
     def __init__(self, bot_name):
         super(BotNotFound, self).__init__(bot_name)

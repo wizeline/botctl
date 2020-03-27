@@ -60,17 +60,18 @@ if __name__ == '__main__':
         test_require=requirements('test-requirements.txt'),
         install_requires=requirements('install-requirements.txt'),
         entry_points={
-            "console_scripts": [
-                "lsbot = botctl.lsbot:main",
-                "mkadmin = botctl.mkadmin:main",
-                "mkbot = botctl.mkbot:main",
-                "rmadmin = botctl.rmadmin:main",
-                "rmbot = botctl.rmbot:main",
-                "showbot = botctl.showbot:main",
-                "botctl = botctl.botctl:main",
-                "botmod = botctl.botmod:main",
-                "botusr = botctl.botusr:main",
-                "integration = botctl.integration:main"
+            'console_scripts': [
+                'lsbot = botctl.lsbot:main',
+                'mkadmin = botctl.mkadmin:main',
+                'mkbot = botctl.mkbot:main',
+                'rmadmin = botctl.rmadmin:main',
+                'rmbot = botctl.rmbot:main',
+                'showbot = botctl.showbot:main',
+                'botctl = botctl.botctl:main',
+                'botmod = botctl.botmod:main',
+                'botusr = botctl.botusr:main',
+                'readbot = botctl.readbot:main',
+                'integration = botctl.integration:main'
             ]
         }
     )
