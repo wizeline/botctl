@@ -77,6 +77,24 @@ class BotClient:
             }
             response = self._gateway.post(url, json=body)
 
+    def get_bot_conversations(self, bot):
+        bot_id = bot.get('id')
+
+        url = f'/bots/{bot_id}/conversations'
+        return self._gateway.get(url).json()
+
+    def get_active_bot_conversations(self, bot):
+        bot_id = bot.get('id')
+
+        url = f'/bots/{bot_id}/conversations'
+        conversations = self._gateway.get(url).json()
+
+        for conversation in conversations:
+            if conversation['isActive']:
+                conversation_id = conversation['id']
+                url += f'/{conversation_id}'
+                return self._gateway.get(url).json()
+
     def install_bot_integration(self,
                                 bot_name,
                                 integration_name,
@@ -100,7 +118,7 @@ class BotClient:
         bot = self.get_by_name(bot_name)
         bot_id = bot.get('id')
 
-        url = f'/bots/{bot_id}/nlp_provider/luis'
+        url = f'/bots/{bot_id}/nlp_provider'
         response = self._gateway.post(url, json=nlp_config)
         if not response.ok:
             print(response.status_code, response.text)
@@ -147,6 +165,10 @@ class BotClient:
             return self.get_customers(bot)
         if attribute == 'users':
             return self.get_bot_users_by_id(bot)
+        if attribute == 'conversations':
+            return self.get_bot_conversations(bot)
+        if attribute == 'conversation':
+            return self.get_active_bot_conversations(bot)
 
         raise UnsupportedBotAttribute(bot, attribute)
 
