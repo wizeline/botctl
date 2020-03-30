@@ -10,29 +10,11 @@ botctl \- configure and select Bots Platform environments
 
 .SH COMMANDS AVAILABLE
 
-.B set
-Set a variable
-.RS
-$ botctl set token ${YOUR_ACCESS_TOKEN}
-.RE
-
-.B get
-Get the value of a variable
-.RS
-$ botctl get integrations
-.RE
-.RS
-http://localhost:8002
-.RE
-
-.B del
-Clears a variable
-.RS
-$ botctl del api_secret
-.RE
-
-.B chenv
-Change the active environment section
+.B chenv:
+the
+.B botctl
+suite lets you work with all the environment of Stello. This command activates
+the environment of your choice.
 
 .RS
 $ botctl chenv local
@@ -47,21 +29,90 @@ $ botctl chenv staging
 $ botctl chenv production
 .RE
 
+.B set:
+The environment settings are stored in a configuration file located at your home
+directory. This command lets you store those settings easily.
+
+.RS
+$ botctl set ${VARIABLE_NAME} ${VARIABLE_VALUE}
+.RE
+
+The most recurrent variable that needs to be set is the access token. In order
+to do so, open to the front end of the environment you want to work with with
+your web browser and log in. Choose the right front end URL from the list
+bellow:
+
+.RS
+production   https://bots.wizeline.com
+.RE
+.RS
+staging      https://cms-frontend-staging.bots-platform.com
+.RE
+.RS
+development  https://cms-frontend-development.bots-platform.com
+.RE
+.RS
+local        http://localhost:8000
+.RE
+
+Once you have the session started, open your browser's developer tools,
+typically by pressing <F12> key; next to the javascript console and copy the
+access token using the
+.B copy()
+javascript function.
+
+.RS
+> copy(localStorage.auth_jwt_id)
+.RE
+
+That function call copies the value of the access token to your clipboard, once
+it's ready, go to the terminal and run the following commands:
+
+.RS
+$ botctl chenv ${ENVIRONMENT}
+.RE
+.RS
+$ botctl set token ${THE_ACCESS_TOKEN_STORED_IN_YOUR_CLIPBOARD}
+.RE
+
+After that, you will be able to youse all the commands provided by the 
+.B botctl
+suite.
+
+.B get:
+Get the value of a variable.
+
+.RS
+$ botctl get integrations
+.RE
+.RS
+http://localhost:8002
+.RE
+
+.B del:
+Clears a variable.
+
+.RS
+$ botctl del api_secret
+.RE
+
 .SH VALID VARIABLES
 
-This is the list of valid variables
+This is the list of valid variables. You will find the correct values (except
+for the token) at https://app-manager.bots-platform.com. Browse to the
+environment of your choice to read the values.
 
-.B cms
-Stores the URL to the Bot CMS backend service
+.B cms:
+Stores the URL to the Bot CMS back end service
 
-.B integrations
+.B integrations:
 Stores the URL to the Bot Integrations Manager service
 
-.B token
+.B token:
 Stores the access token to the Bots Platform
 
-.B api_secret
-Stores the internal api secret. Useful to perform operations on the integrations manager. See
+.B api_secret:
+Stores the internal API secret. Useful to perform operations on the integrations manager. See
 .BR integration (1)
 command for details
 
@@ -69,4 +120,4 @@ command for details
 integration(1) lsbot(1) mkbot(1) rmbot(1) botmod(1)
 
 .SH AUTHOR
-Diego Guzman (diego.guzman@wizeline.com)
+Diego Guzmán (diego.guzman@wizeline.com)

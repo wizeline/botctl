@@ -6,40 +6,68 @@ readbot \- Read properties of a bot
 .SH SYNOPSIS
 
 .B readbot
-BOT_NAME[.PROPERTY]
+$BOT_NAME[.PROPERTY]
+
+Displays information of the selected bot, in JSON format unless it is simple data.
 
 Properties supported: id, name, integrations, nlp, qna, users, admins, customers
 
+The bot identifier
 .RS
-$ readbot BOT_NAME
+$ readbot $BOT_NAME.id
+.RE
+
+Basic information of the bot
+.RS
+$ readbot $BOT_NAME
+.RE
+
+The integrations installed for the bot
+.RS
+$ readbot $BOT_NAME.integrations
+.RE
+
+The NLP provider information
+.RS
+$ readbot $BOT_NAME.nlp
+.RE
+
+The QNA provider information
+.RS
+$ readbot $BOT_NAME.qna
+.RE
+
+All the users of the bot
+.RS
+$ readbot $BOT_NAME.users
+.RE
+
+The bot users with role "Customer"
+.RS
+$ readbot $BOT_NAME.customers
+.RE
+
+The bot users with role "Admin"
+.RS
+$ readbot $BOT_NAME.admins
+.RE
+
+The conversation script currently active
+.RS
+$ readbot $BOT_NAME.conversation
+.RE
+
+The metadata related to all the conversations that have been installed in the bot
+.RS
+$ readbot $BOT_NAME.conversations
 .RE
 
 .RS
-$ readbot BOT_NAME.id
+$ readbot BOT_NAME.conversations
 .RE
 
 .RS
-$ readbot BOT_NAME.integrations
-.RE
-
-.RS
-$ readbot BOT_NAME.nlp
-.RE
-
-.RS
-$ readbot BOT_NAME.qna
-.RE
-
-.RS
-$ readbot BOT_NAME.users
-.RE
-
-.RS
-$ readbot BOT_NAME.customers
-.RE
-
-.RS
-$ readbot BOT_NAME.admins
+$ readbot BOT_NAME.conversation
 .RE
 
 .SH AUTHOR
