@@ -45,10 +45,25 @@ class InstallNLP(BotClientCommand):
         return 0
 
 
+class InstallChannelCommand(BotClientCommand):
+    """Usage:
+    $ botmod install-channel {BOT_NAME}.{CHANNEL} < CHANNEL_CONFIG.json
+    """
+    __commandname__ = 'botmod'
+    expects_input = True
+
+    @command_callback
+    def __call__(self, bot_and_channel):
+        bot_name, channel_name = bot_and_channel.split('.')
+        self.client.install_channel(bot_name, channel_name, self.input)
+        return 0
+
+
 def main():
     callbacks = {
         'install-conversation': InstallConversationCommand,
         'install-integration': InstallIntegrationCommand,
+        'install-channel': InstallChannelCommand,
         'install-nlp': InstallNLP
     }
     return execute_subcommand('botmod', **callbacks)
