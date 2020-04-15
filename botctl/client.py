@@ -114,6 +114,23 @@ class BotClient:
             sys.stderr.write((f'Could not install {integration_name} '
                               f'integration on bot {bot_name}\n'))
 
+    def install_channel(self, bot_name, channel_name, channel_config):
+        bot = self.get_by_name(bot_name)
+        bot_id = bot.get('id')
+
+        url = f'/bots/{bot_id}/platforms/{channel_name}'
+        response = self._gateway.post(url, json=channel_config, fail=False)
+
+        if not response.ok:
+            message = response.json().get('message')
+
+            sys.stderr.write((f'Could not install {channel_name} '
+                              f'integration on bot {bot_name}\n'))
+            sys.stderr.write(f'POST {response.request.url}\n')
+            sys.stderr.write(f'Status code: {response.status_code}\n')
+            if message is not None:
+                sys.stderr.write(f'Reason: {message}\n')
+
     def install_nlp(self, bot_name, nlp_config):
         bot = self.get_by_name(bot_name)
         bot_id = bot.get('id')
